@@ -1,0 +1,15 @@
+name: Keep Backend Alive
+
+# Schedule the job to run every 14 minutes
+on:
+  schedule:
+    - cron: "*/14 * * * *" # Runs every 14 minutes
+
+jobs:
+  ping-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send a ping request to the backend
+        run: |
+          curl -X GET https://ubc-events-finder.onrender.com/ping
