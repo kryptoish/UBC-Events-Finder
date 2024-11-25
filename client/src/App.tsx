@@ -14,6 +14,8 @@ const App: React.FC = () => {
       });
   }, []);
 
+  console.log('API Base URL:', import.meta.env.VITE_API_URL);
+
   if (error) return <div>{error}</div>;
   return <div>{message || "Loading..."}</div>;
 };
