@@ -2,6 +2,7 @@ package main
 
 import (
     "fmt"
+    "os"
     "encoding/json"
     "net/http"
 )
@@ -15,12 +16,13 @@ type MediaResponse struct {
 	} `json:"data"`
 }
 
-const token = "IGQWROSHJuX3FFaDhWZAGdYRUhMdzZAjbXJFWHlzWkMyNmZAEN3I2Q2hUXzlHREhyN2ZAtdXNFZAUlIb01rZAlMtX0NhOTVOUUZABbGNjcW8zZADJ0RlRBVVZACN3JiV1FjZAnhQRXkwZAFhCd2NNc0JNUDZAtekxlRmxpRkp2ZADgZD"
-const username = "quansenycz" /* currently using my personal acct because
-                            that is what I was able to set the API
-                            access through */
 
 func main() {
+    token := os.Getenv("qAPI_KEY")
+    username := os.Getenv("qUSER") /* currently using my personal acct because
+                                that is what I was able to set the API
+                                access through */
+
     http.HandleFunc("/", handleRoot)
     http.HandleFunc("/auth/callback", handleAuthRedirect)
     
@@ -34,6 +36,9 @@ func main() {
 func handleRoot (w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Access-Control-Allow-Origin", "*")
     w.Header().Set("Content-Type", "application/json")
+    
+    token := os.Getenv("qAPI_KEY")
+    username := os.Getenv("qUSER") 
 	
 	//get_token()
     post := retrieve_post_data(token, username)
