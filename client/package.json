@@ -10,9 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mantine/core": "^7.13.5",
-    "@mantine/hooks": "^7.13.5",
+    "@mantine/core": "^7.14.2",
+    "@mantine/hooks": "^7.14.2",
     "@primer/octicons-react": "^19.12.0",
+    "@vercel/edge-config": "^1.4.0",
+    "next": "^15.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "swr": "^2.2.5"

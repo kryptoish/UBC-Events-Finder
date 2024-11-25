@@ -3,6 +3,22 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
+
+import { NextResponse } from 'next/server';
+import { get } from '@vercel/edge-config';
+
+export const config: { matcher: string } = { matcher: '/welcome' };
+
+export async function middleware(): Promise<NextResponse> {
+  const greeting = await get('greeting'); // greeting is type string | undefined
+
+  if (!greeting) {
+    return NextResponse.json({ error: 'Greeting not found' }, { status: 404 });
+  }
+
+  return NextResponse.json({ greeting }); // Safe to use greeting here as it's definitely a string
+}
+
 function App() {
   const [count, setCount] = useState(0)
 
