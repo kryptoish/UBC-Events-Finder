@@ -15,7 +15,7 @@ type MediaResponse struct {
 	} `json:"data"`
 }
 
-const token = "IGQWRNVllTZAFo5R0NZAOTNjeGVfaHpNSmFHY0xOcnhJYlpKaHRYZAVFicmJWU2F5dHlGNHdwTkRVaER5aWtETWlTem1vcVJtcV9aRTVaWlNJdG8ydkNfbFFHblVvVnl2ZA2RFZA2lHNlpVYlBwMkRSNC13RWxydW1hSDgZD"
+const token = "IGQWROSHJuX3FFaDhWZAGdYRUhMdzZAjbXJFWHlzWkMyNmZAEN3I2Q2hUXzlHREhyN2ZAtdXNFZAUlIb01rZAlMtX0NhOTVOUUZABbGNjcW8zZADJ0RlRBVVZACN3JiV1FjZAnhQRXkwZAFhCd2NNc0JNUDZAtekxlRmxpRkp2ZADgZD"
 const username = "quansenycz" /* currently using my personal acct because
                             that is what I was able to set the API
                             access through */
@@ -25,7 +25,7 @@ func main() {
     http.HandleFunc("/auth/callback", handleAuthRedirect)
     
 	post := retrieve_post_data(token, username)
-	//fmt.Printf("cap: %s", post.Data[0].Caption);
+	fmt.Printf("cap: %s", post.Data[0].Caption);
 
     //fmt.Print("before")
     http.ListenAndServe(":8080", nil)
