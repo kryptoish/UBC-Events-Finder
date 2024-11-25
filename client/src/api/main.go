@@ -6,9 +6,11 @@ import (
 )
 
 func main() {
-    http.HandleFunc("/api/greeting", func(w http.ResponseWriter, r *http.Request) {
-        response := map[string]string{"message": "Hello from Go!"}
+    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Access-Control-Allow-Origin", "*")
         w.Header().Set("Content-Type", "application/json")
+		
+		response := map[string]string{"message": "Hello from Go!"}
         json.NewEncoder(w).Encode(response)
     })
 
