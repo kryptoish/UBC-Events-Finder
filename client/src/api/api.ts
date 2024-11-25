@@ -5,6 +5,6 @@ const api = axios.create({
 });
 
 export const getGreeting = async () => {
-  const response = await api.get('greeting');
+  const response = await api.get('api/greeting');
   return response.data;
 };
