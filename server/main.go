@@ -1,21 +1,31 @@
 package main
 
 import (
-	"fmt"
-	"log"
+	// "fmt"
+	// "log"
 
-	"github.com/gofiber/fiber/v2"
+	// "github.com/gofiber/fiber/v2"
+	"encoding/json"
+    "net/http"
 )
 
 
 func main() {
-	fmt.Print("Hello World")
+	// fmt.Print("Hello World")
 
-	app := fiber.New()
+	// app := fiber.New()
 
-	app.Get("/healthcheck", func(c *fiber.Ctx) error {
-		return c.SendString("OK")
-	})
+	// app.Get("/healthcheck", func(c *fiber.Ctx) error {
+	// 	return c.SendString("OK")
+	// })
 
-	log.Fatal(app.Listen(":4000"))
+	http.HandleFunc("/api/greeting", func(w http.ResponseWriter, r *http.Request) {
+        response := map[string]string{"message": "Hello from Go!"}
+        w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(response)
+    })
+
+    http.ListenAndServe(":8080", nil)
+
+	// log.Fatal(app.Listen(":4000"))
 }
