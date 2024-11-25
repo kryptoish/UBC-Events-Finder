@@ -15,7 +15,7 @@ type MediaResponse struct {
 	} `json:"data"`
 }
 
-const token = "IGQWROM3ZAMbFFpT1hLYnRyNDRNazF3eUFkaUNDVVhuMFdLYld6WGYxVktHRjdXdklVTFhqdlNXXy1heFV2NU9jWW5iZAkZA6RWJmS3pJM3dRcGhIcE54aEplMjFzYXdCLUptMkppcGJWNnNNYmxxU2hxS3VKVkt6eUEZD"
+const token = "IGQWRQXzBEQVVBRXFaNzBrX001ZA2RRaXQ3RTQ0UmxMV3Y5ZA0t3VTBsYUlWbEFsdjIzUkJucFcxWlk5WkxPU1NwWnF4cTBZANzZAPVG5vMEN1cFVhb0VyZAWtaYXg1ME9zOTFNb0FKRDdEWWRrX2VXX0pTQm5OQ2t0N1IxdUN0cTZAYeXRYUQZDZD"
 const username = "quansenycz" /* currently using my personal acct because
                             that is what I was able to set the API
                             access through */
