@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getGreeting } from './api/api';
+import { getGreeting } from './api/api.ts';
 
 const App: React.FC = () => {
   const [message, setMessage] = useState<string>('');
