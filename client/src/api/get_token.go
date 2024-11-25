@@ -9,7 +9,7 @@ import (
 )
 
 const appID = "935845381976691"
-const client_secret = "0e6b017022486d4cde408be678c44db1"
+const client_secret = "589f481d9cf782bdc1dc0d9689556218"
 const redirectURI = "https://"
 
 /**
