@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-const local = true;
+const local = false;
 
 type MediaResponse struct {
 	Data []struct {

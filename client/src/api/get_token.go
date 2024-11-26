@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 )
 
-const redirect_uri = "https://ubc-events-finder.vercel.app/auth/callback"
+const redirect_uri = "https://ubc-events-finder.vercel.app/auth/callback/"
 
 
 /**
