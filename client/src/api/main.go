@@ -39,9 +39,15 @@ func main() {
     
     post := retrieve_post_data(token, retrieve_user_id(token))
 	fmt.Printf("cap: %s", post.Data[0].Caption);
+    http.HandleFunc("/ping", pingHandler)
 
     //fmt.Print("before")
     http.ListenAndServe(":8080", nil)
+}
+
+func pingHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Server is alive"))
 }
 
 func handleRoot (w http.ResponseWriter, r *http.Request) {
