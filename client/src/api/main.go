@@ -5,7 +5,11 @@ import (
     "os"
     "encoding/json"
     "net/http"
+
+	"github.com/spf13/viper"
 )
+
+const local = true;
 
 type MediaResponse struct {
 	Data []struct {
@@ -16,17 +20,24 @@ type MediaResponse struct {
 	} `json:"data"`
 }
 
-
 func main() {
-    token := os.Getenv("qAPI_KEY")
-    username := os.Getenv("qUSER") /* currently using my personal acct because
+	var token string
+	if (local) {
+		viper.SetConfigFile(".env")
+		viper.ReadInConfig()
+		token = viper.Get("qAPI_KEY").(string)
+	} else {
+		token = os.Getenv("qAPI_KEY")
+	}
+
+    /*username := os.Getenv("qUSER") /* currently using my personal acct because
                                 that is what I was able to set the API
                                 access through */
 
     http.HandleFunc("/", handleRoot)
     http.HandleFunc("/auth/callback", handleAuthRedirect)
     
-	post := retrieve_post_data(token, username)
+    post := retrieve_post_data(token, retrieve_user_id(token))
 	fmt.Printf("cap: %s", post.Data[0].Caption);
 
     //fmt.Print("before")
@@ -37,11 +48,16 @@ func handleRoot (w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Access-Control-Allow-Origin", "*")
     w.Header().Set("Content-Type", "application/json")
     
-    token := os.Getenv("qAPI_KEY")
-    username := os.Getenv("qUSER") 
+	var token string
+	if (local) {
+		token = viper.Get("qAPI_KEY").(string)
+	} else {
+		token = os.Getenv("qAPI_KEY")
+	}
+    //username := os.Getenv("qUSER") 
 	
 	//get_token()
-    post := retrieve_post_data(token, username)
+    post := retrieve_post_data(token, retrieve_user_id(token))
     
     response := map[string]string{"message": post.Data[0].Caption}
     json.NewEncoder(w).Encode(response)
@@ -54,7 +70,18 @@ func handleAuthRedirect(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    fmt.Printf("Authorization Code: %s\n", code)
+    //untested
+    token := get_token(code)
+    fmt.Printf("Not an error: %s", token)
+    /*
+    userID := retrieve_user_id(token)
+    //err = store_token(userID, token) //something to do with database stuff
+                                    // maybe PostgreSQL on Render
+    if err != nil {
+        http.Error(w, "Failed to store token", http.StatusInternalServerError)
+        return
+    } 
+    */
 
-    fmt.Fprintf(w, "Authorization successful! Code: %s", code)
+    http.Redirect(w, r, "/?authStatus=success", http.StatusFound)
 }
