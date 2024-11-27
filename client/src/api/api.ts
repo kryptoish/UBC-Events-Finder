@@ -8,3 +8,8 @@ export const getGreeting = async () => {
   const response = await api.get('/api/main');
   return response.data;
 };
+
+export const getKey = async () => {
+  const response = await api.get('/api/main');
+  return response.data;
+};
