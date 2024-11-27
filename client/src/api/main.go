@@ -99,7 +99,6 @@ func handleAuthRedirect(w http.ResponseWriter, r *http.Request) {
 
     //untested
     token := get_token(code)
-    fmt.Printf("Not an error: %s", token)
     response := map[string]string{"token": token}
     json.NewEncoder(w).Encode(response)
     /*
@@ -112,5 +111,4 @@ func handleAuthRedirect(w http.ResponseWriter, r *http.Request) {
     } 
     */
 
-    //http.Redirect(w, r, "/?authStatus=success", http.StatusFound)
 }
