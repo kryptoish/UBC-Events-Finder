@@ -1,21 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { getGreeting } from '../api/api';
+import { useLocation } from 'react-router-dom';
+import { getKey } from '../api/api';
 
 const AuthCallback: React.FC = () => {
   const [message, setMessage] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getGreeting()
+    const searchParams = new URLSearchParams(location.search);
+    const code = searchParams.get('code');
+
+    if (code) {
+    getKey(code)
       .then(data => setMessage(data.token))
       .catch(err => {
         console.error('Error fetching greeting:', err);
         setError('Failed to load greeting');
       });
-  }, []);
+    } else {
+      setError('Code not found');
+    }
+  }, [location.search]);
 
   if (error) return <div>{error}</div>;
-  return <div>{message || "Loading..."}</div>;
+  return <div>{message || "Loading callback..."}</div>;
 };
 
 export default AuthCallback;

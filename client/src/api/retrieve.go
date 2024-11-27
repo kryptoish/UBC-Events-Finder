@@ -39,12 +39,6 @@ func retrieve_post_data(access_token, userID string) MediaResponse {
 		log.Fatalf("Error parsing media response: %v", err)
 	}
 
-	for _, post := range mediaData.Data {
-		fmt.Printf("Caption: %s\n", post.Caption)
-		fmt.Printf("Media URL: %s\n", post.MediaURL)
-		fmt.Printf("Permalink: %s\n", post.Permalink)
-	}
-
 	return mediaData
 }
 
@@ -52,22 +46,26 @@ func retrieve_user_id(access_token string) string {
 	user_id_url := fmt.Sprintf("https://graph.instagram.com/v21.0/me?fields=id,username&access_token=%s", access_token)
 	response, err := http.Get(user_id_url)
 	if err != nil {
+		fmt.Printf("Error getting user ID: %v", err)
 		log.Fatalf("Error getting user ID: %v", err)
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(response.Body)
+		fmt.Printf("Error response getting user ID: %s", body)
 		log.Fatalf("Error response getting user ID: %s", body)
 	}
 
 	var response_decoded map[string]interface{}	
 	if err := json.NewDecoder(response.Body).Decode(&response_decoded); err != nil {
+		fmt.Printf("Error decoding response: %v", err)
 		log.Fatalf("Error decoding response: %v", err)
 	}
 
 	user_id, ok := response_decoded["id"].(string)
 	if !ok {
+		fmt.Printf("Error parsing user ID response: %v", err)
 		log.Fatalf("Error parsing user ID response: %v", err)
 	}	
 

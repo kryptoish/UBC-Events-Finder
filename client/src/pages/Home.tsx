@@ -3,11 +3,15 @@ import { getGreeting } from '../api/api';
 
 const Home: React.FC = () => {
   const [message, setMessage] = useState<string>('');
+  const [imageUrl, setImageUrl] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     getGreeting()
-      .then(data => setMessage(data.message))
+      .then(data => { 
+        setMessage(data.message)
+        setImageUrl(data.imageUrl)
+      })
       .catch(err => {
         console.error('Error fetching greeting:', err);
         setError('Failed to load greeting');
@@ -15,7 +19,13 @@ const Home: React.FC = () => {
   }, []);
 
   if (error) return <div>{error}</div>;
-  return <div>{message || "Loading..."}</div>;
+
+  return (
+    <div>
+      <p>{message || "Loading..."}</p>
+      {imageUrl && <img src={imageUrl} alt="first Image" style={{ maxWidth: '50%', height: 'auto' }} />}
+    </div>
+  );
 };
 
 export default Home;
