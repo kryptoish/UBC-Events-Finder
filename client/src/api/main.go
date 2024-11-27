@@ -31,6 +31,7 @@ func main() {
         frontend = "http://localhost:5173"
 	} else {
 		token = os.Getenv("qAPI_KEY")
+        frontend = "https://ubc-events-finder.vercel.app/"
 	}
     
     c := cors.New(cors.Options{
