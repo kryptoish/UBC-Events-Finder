@@ -10,7 +10,7 @@ import (
     "github.com/rs/cors"
 )
 
-const local = false;
+const local = true;
 
 type MediaResponse struct {
 	Data []struct {
@@ -98,7 +98,10 @@ func handleAuthRedirect(w http.ResponseWriter, r *http.Request) {
     }
 
     //untested
-    token := get_token(code)
+    token, err := get_token(code)
+    if err != nil {
+        http.Redirect(w, r, "https://google.com", http.StatusOK)
+    }
     response := map[string]string{"token": token}
     json.NewEncoder(w).Encode(response)
     /*

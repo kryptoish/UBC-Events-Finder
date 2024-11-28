@@ -1,7 +1,7 @@
 import React from 'react';
 import {Routes, Route } from 'react-router-dom';
 import Home from '../Home';
-import AuthCallback from '../auth/callback/AuthCallback';
+import AuthCallback from './AuthCallback';
 
 const App: React.FC = () => {
   return (

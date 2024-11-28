@@ -1,9 +1,9 @@
 package main
 
 import (
-	"log"
 	"os"
 	"fmt"
+	"errors"
 
 	"net/url"
 	"net/http"
@@ -18,7 +18,7 @@ const redirect_uri = "https://ubc-events-finder.vercel.app/auth/callback/"
 *
 * Currently just prints the retrieved info and d
 */
-func get_token(code string) string {
+func get_token(code string) (string, error) {
 	fmt.Printf("get token from code: %s\n", code)
 	appID := os.Getenv("APP_ID")
 	client_secret := os.Getenv("CLIENT_SECRET")
@@ -33,7 +33,10 @@ func get_token(code string) string {
 		"code":          {code},
 	}
 	short_term_auth_url := "https://api.instagram.com/oauth/access_token" 
-	short_term_token := exchange_token(short_term_auth_url, short_form_data)
+	short_term_token, err := exchange_token(short_term_auth_url, short_form_data)
+	if err != nil {
+		return "", err
+	}
 
 
 	
@@ -43,29 +46,35 @@ func get_token(code string) string {
 		"access_token":  {short_term_token},
 	}
 	long_term_auth_url := "https://graph.instagram.com/oauth/access_token" 
-	long_term_token := exchange_token(long_term_auth_url, long_form_data)
+	long_term_token, err := exchange_token(long_term_auth_url, long_form_data)
+	if err != nil {
+		return "", err
+	}
 	
-	return long_term_token
+	return long_term_token, nil
 }
 
-func exchange_token(url string, form_data url.Values) string {
+func exchange_token(url string, form_data url.Values) (string, error) {
 	response, err := http.PostForm(url, form_data)
 	if err != nil {
-		log.Fatalf("error getting access_token:    %v\n", err)
+		//log.Fatalf("error getting access_token:    %v\n", err)
+		return "", err
 	}
 	defer response.Body.Close()
 	
 	var data map[string]interface{}
 	if err := json.NewDecoder(response.Body).Decode(&data); err != nil {
-		log.Fatalf("Error parsing response: %v\n", err)
+		//log.Fatalf("Error parsing response: %v\n", err)
+		return "", err
 	}
 	
 	//fmt.Printf("Data: %s\n", data)
 
 	token, ok := data["access_token"].(string)
 	if !ok {
-		log.Fatalf("Unable to get token from response\n")
+		//log.Fatalf("Unable to get token from response\n")
+		return "", errors.New("Unable to get token from response\n")
 	}
 
-	return token
+	return token, nil
 }
