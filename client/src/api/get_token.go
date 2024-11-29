@@ -57,22 +57,18 @@ func get_token(code string) (string, error) {
 func exchange_token(url string, form_data url.Values) (string, error) {
 	response, err := http.PostForm(url, form_data)
 	if err != nil {
-		//log.Fatalf("error getting access_token:    %v\n", err)
 		return "", err
 	}
 	defer response.Body.Close()
 	
 	var data map[string]interface{}
 	if err := json.NewDecoder(response.Body).Decode(&data); err != nil {
-		//log.Fatalf("Error parsing response: %v\n", err)
 		return "", err
 	}
 	
-	//fmt.Printf("Data: %s\n", data)
 
 	token, ok := data["access_token"].(string)
 	if !ok {
-		//log.Fatalf("Unable to get token from response\n")
 		return "", errors.New("Unable to get token from response\n")
 	}
 
