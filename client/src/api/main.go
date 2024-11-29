@@ -27,7 +27,7 @@ type ProcessedResponse struct {
 		Caption   string `json:"caption"`
 		MediaURL  string `json:"media_url"`
 		Permalink string `json:"permalink"`
-        Faculty   string `json:"faculty"`
+        Username  string `json:"username"`
         Food      string `json:"food"`
         Date      string `json:"date"`
         Time      string `json:"time"`
@@ -96,11 +96,7 @@ func handleRoot (w http.ResponseWriter, r *http.Request) {
     posts := retrieve_post_data(token, retrieve_user_id(token))
     food_posts := filter_data(posts)
     
-    firstResponse := map[string]string{
-        "message": posts.Data[0].Caption,
-        "imageUrl": posts.Data[0].MediaURL,
-    }
-    json.NewEncoder(w).Encode(firstResponse)
+    json.NewEncoder(w).Encode(food_posts)
 }
 
 func handleAuthRedirect(w http.ResponseWriter, r *http.Request) {
