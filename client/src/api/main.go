@@ -85,14 +85,42 @@ func handleRoot (w http.ResponseWriter, r *http.Request) {
     var relavent_data []ProcessedResponse
 
     user_id, username := retrieve_user_id(chbe_token, w)
-    fmt.Printf("chbe username: %s\n", username)
     posts := retrieve_post_data(chbe_token, user_id, w)
-    fmt.Printf("chbe post: %s\n", posts.Data[0].Caption)
+
+
+
     food_posts := filter_data(posts)
     relavent_data = append(relavent_data, relavent_info(food_posts, username))
 
-    final_data := mergedResponses(relavent_data)
-    json.NewEncoder(w).Encode(final_data)
+    final_data := mergedResponses(relavent_data)	
+    /*testData := ProcessedResponse{
+		Data: []struct {
+			ID        string `json:"id"`
+			Caption   string `json:"caption"`
+			MediaURL  string `json:"media_url"`
+			Permalink string `json:"permalink"`
+			Username  string `json:"username"`
+			Food      string `json:"food"`
+			Date      string `json:"date"`
+			Time      string `json:"time"`
+			Location  string `json:"location"`
+		}{
+			relavent_data[0].Data[0], // Copy the first element of originalResponse.Data
+		},
+	}
+    if local { 
+        jsonData, _ := json.MarshalIndent(final_data, "", "  ")
+
+        // Print the JSON string
+        fmt.Println(string(jsonData))
+    }*/
+    
+    /*respond := map[string]string {
+        "caption": testData.Data[0].Caption,
+        "media_url": testData.Data[0].MediaURL,
+    }*/
+    //json.NewEncoder(w).Encode(respond)
+    json.NewEncoder(w).Encode(final_data) 
 }
 
 func handleAuthRedirect(w http.ResponseWriter, r *http.Request) {
@@ -122,3 +150,10 @@ func handleAuthRedirect(w http.ResponseWriter, r *http.Request) {
     */
 
 }
+
+/*
+func printProcessedResponse(info ProcessedResponse) {
+    for _, item := range info.Data {
+        fmt.Printf("")
+    }
+}*/

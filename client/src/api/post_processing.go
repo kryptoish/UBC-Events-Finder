@@ -19,6 +19,9 @@ var KeyTerms = []string{
 	"cookies",
 	"muffins",
 	"snacks",
+	"BBQ",
+	"hotdogs",
+	"burgers",
 }
 
 var FoodTerms = []string{
@@ -29,6 +32,7 @@ var FoodTerms = []string{
 	"Snacks",
 	"Red bull",
 	"Candy",
+	"Hotdogs",
 }
 
 /**
@@ -140,9 +144,14 @@ func processDateTime(caption string) (string, string) {
 
 func processLocation (caption string) string {
 	locationRegex := regexp.MustCompile(`\b((?i)(location|room):?\s)([A-Za-z, ]*[0-9]*)`)
+	var location string
 
 	locations := locationRegex.FindStringSubmatch(caption)
-	location := locations[3]
+	if locations != nil {
+		location = locations[3]
+	} else {
+		location = ""
+	}
 	return location
 }
 
