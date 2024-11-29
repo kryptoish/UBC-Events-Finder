@@ -126,17 +126,21 @@ func processDateTime(caption string) (string, string) {
 	/* If there is no minute info, append blank minute info */
 	timeReg := regexp.MustCompile(`((\d{1,2})(:\d\d)?\s*([aApP][mM])|(\d{1,2})(:\d\d)\s*([aApP][mM])?)`)//-((\d{1,2})(:\d\d)?\s*([aApP][mM])|(\d{1,2})(:\d\d)\s*[aApP][mM])?`)
 	timeString := timeReg.FindStringSubmatch(caption)
+	fmt.Printf("timeString: %s\n", timeString[0])
 	if timeString == nil {
 		time = ""
 		tempTime = "00:00"
-	} else if timeString[2] == "" {
+	} else if !strings.Contains(timeString[0], ":") {
 		minutes := ":00"
-		time = fmt.Sprintf("%s%s %s", timeString[1], minutes, timeString[3])
-		tempTime = time
+		tempTime = fmt.Sprintf("%s%s %s", timeString[2], minutes, timeString[4])
+	} else {
+		tempTime = timeString[0]
 	}
+	time = tempTime
 
+	//potential way to avoid the regexs but performace is subpar
 	//_, dates, _ := dateparser.Search(cfg, caption)
-	//println(dates[1].Date.Period.String())
+	//println(dates[0].Date.Time.String())
 
 	for _, pattern := range dateExps{
 		regex := regexp.MustCompile(pattern)
@@ -145,13 +149,12 @@ func processDateTime(caption string) (string, string) {
 			if year := yearExp.FindString(match[0]); year == "" {
 				match[0] = match[0] + " 2024"
 				match[2] = match[2] + " 2024"
-				//println(match[0])
 			}
 
 
-			dateTime, _ := dateparser.Parse(cfg, match[0] + " " + tempTime)
+			dateTime, _ := dateparser.Parse(cfg, match[0] + " " + time)
 			if strings.Contains(strings.ToLower(match[0]), strings.ToLower("date")) {
-				dateTime, _ = dateparser.Parse(cfg, match[2] + " " + tempTime)
+				dateTime, _ = dateparser.Parse(cfg, match[2] + " " + time)
 			}
 				
 			subsections := postDateRegex.FindStringSubmatch(dateTime.Time.String())
@@ -162,9 +165,9 @@ func processDateTime(caption string) (string, string) {
 				date = subsections[0]
 			}
 
-			tempTime := postTimeRegex.FindString(dateTime.Time.String())
+			time := postTimeRegex.FindString(dateTime.Time.String())
 
-			return date, tempTime
+			return date, time
 		}
 	}
 	return date, time
