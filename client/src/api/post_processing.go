@@ -126,7 +126,6 @@ func processDateTime(caption string) (string, string) {
 	/* If there is no minute info, append blank minute info */
 	timeReg := regexp.MustCompile(`((\d{1,2})(:\d\d)?\s*([aApP][mM])|(\d{1,2})(:\d\d)\s*([aApP][mM])?)`)//-((\d{1,2})(:\d\d)?\s*([aApP][mM])|(\d{1,2})(:\d\d)\s*[aApP][mM])?`)
 	timeString := timeReg.FindStringSubmatch(caption)
-	fmt.Printf("timeString: %s\n", timeString[0])
 	if timeString == nil {
 		time = ""
 		tempTime = "00:00"
@@ -158,7 +157,6 @@ func processDateTime(caption string) (string, string) {
 			}
 				
 			subsections := postDateRegex.FindStringSubmatch(dateTime.Time.String())
-			println(dateTime.Time.String())
 			if subsections[1] != "2024" {
 				date = fmt.Sprintf("%s-%s-%s", "2024", subsections[2], subsections[3])
 			} else {

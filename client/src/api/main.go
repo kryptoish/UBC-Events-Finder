@@ -75,21 +75,35 @@ func handleRoot (w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
     
 	var chbe_token string
+    var eus_token string
+    var ece_token string
 	if (local) {
 		chbe_token = viper.Get("CHBE_KEY").(string)
+		eus_token = viper.Get("EUS_KEY").(string)
+		ece_token = viper.Get("ECE_KEY").(string)
 	} else {
 		chbe_token = os.Getenv("CHBE_KEY")
+		eus_token = os.Getenv("EUS_KEY")
+		ece_token = os.Getenv("ECE_KEY")
 	}
    
     var relavent_data []ProcessedResponse
 
-    user_id, username := retrieve_user_id(chbe_token, w)
-    posts := retrieve_post_data(chbe_token, user_id, w)
+    chbe_id, _ := retrieve_user_id(chbe_token, w)
+    chbe_posts := retrieve_post_data(chbe_token, chbe_id, w)
+    chbe_food_posts := filter_data(chbe_posts)
+    relavent_data = append(relavent_data, relavent_info(chbe_food_posts, "chbecouncil"))
+    
+    eus_id, _ := retrieve_user_id(eus_token, w)
+    eus_posts := retrieve_post_data(eus_token, eus_id, w)
+    eus_food_posts := filter_data(eus_posts)
+    relavent_data = append(relavent_data, relavent_info(eus_food_posts, "ubcengineers"))
+    
+    ece_id, _ := retrieve_user_id(ece_token, w)
+    ece_posts := retrieve_post_data(ece_token, ece_id, w)
+    ece_food_posts := filter_data(ece_posts)
+    relavent_data = append(relavent_data, relavent_info(ece_food_posts, "eceubc"))
 
-
-
-    food_posts := filter_data(posts)
-    relavent_data = append(relavent_data, relavent_info(food_posts, username))
 
     final_data := mergedResponses(relavent_data)	
     json.NewEncoder(w).Encode(final_data) 
