@@ -22,5 +22,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "auth/callback/AuthCallback.tsx", "Home.tsx"]
+  "include": ["src", "auth/callback/AuthCallback.tsx", "src/Home.tsx"]
 }

@@ -1,13 +1,47 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeedUBC - Free Food Events Around Campus</title>
+    <link rel="stylesheet" href="/src/styles.css">
+    <link rel="icon" type="image/x-icon" href="/src/assets/favicon.ico">
+
+    <!-- add-to-calandar cdn -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/add-to-calendar-button"></script>
+
+    <script src="/src/main.tsx" type = "module"></script>
+</head>
+<body style="background-color: rgb(255, 255, 255);">
+    <div style="text-align: center; margin-top: 20px;">
+        <img src="/src/assets/feedUBC.png" alt="feedUBC Logo" style="max-width: 400px; height: auto;">
+    </div>
+    <div class="header-row">
+        <!-- Club Filter -->
+        <div class="filter-dropdown">
+            <label class="filter-label" for="club-filter">Filter by Club:</label>
+            <select id="club-filter" name="club">
+                <option value="all" selected>All</option>
+            </select>
+        </div>
+        
+        <div class="filter-dropdown">
+            <label class="filter-label" for="food-filter">Filter by Food:</label>
+            <select id="food-filter" name="food">
+                <option value="all" selected>All</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Container to hold event cards -->
+    <div id="events-container"></div>
+    <!-- Modal for Event Details -->
+    <div id="event-modal" class="event-modal hidden">
+        <div class="event-modal-content">
+            <button id="modal-close" class="modal-close">X</button>
+            <div id="modal-details"></div>
+        </div>
+    </div>
+
+</body>
 </html>

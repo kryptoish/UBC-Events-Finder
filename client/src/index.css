@@ -1,68 +1,242 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
+/* ================== Global Styles ================== */
 body {
-  margin: 0;
+  font-family: 'Noto Sans', sans-serif; /* Global font */
+  font-size: 16px; /* Base font size */
+  line-height: 1.5; /* Better readability */
+  color: #333; /* Default text color */
+  background-color: #f9f9f9; /* Background color */
+}
+
+/* ================== Events Container ================== */
+#events-container {
+  display: flex; /* Flexbox layout */
+  flex-wrap: wrap; /* Allow wrapping to new rows */
+  justify-content: center; /* Center content */
+  align-items: flex-start; /* Align items to the top */
+  padding: 50px; /* Padding around the container */
+  gap: 35px; /* Slightly increased space between items */
+  max-width: 100%; /* Prevent container overflow */
+  box-sizing: border-box; /* Include padding in width */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
+
+/* ================== Event Card ================== */
+.event-card {
+  width: 100%; /* Allow card to expand with the image */
+  max-width: 350px; /* Reduced max width for smaller cards */
+  background-color: #f9f9f9; /* Card background */
+  border-radius: 15px; /* More rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  overflow: hidden; /* Clip overflowing content */
+  margin: 0 auto; /* Center the card within its container */
+  transition: transform 0.2s ease, box-shadow 0.2s ease; /* Hover effect */
+  display: flex; /* Flex layout */
+  flex-direction: column; /* Stack children vertically */
+}
+
+.event-card:hover {
+  transform: scale(1.05); /* Slight zoom effect */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+  cursor: pointer; /* Indicate clickability */
+}
+
+/* Event Image */
+.event-card img {
+  width: 100%; /* Full card width */
+  height: auto; /* Let image height adjust automatically */
+  object-fit: cover; /* Maintain image aspect ratio */
+  border-radius: 15px 15px 0 0; /* Rounded corners matching the card */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+}
+
+/* Event Details Section */
+.event-details {
+  padding: 15px; /* Add padding around details */
+  text-align: center; /* Center-align text */
+  color: #333; /* Text color */
+}
+
+.event-details h2 {
+  font-size: 18px; /* Slightly smaller title size */
+  margin: 10px 0; /* Spacing above and below */
+  font-weight: bold; /* Bold title */
+}
+
+.event-details p {
+  font-size: 14px; /* Smaller paragraph font size */
+  margin: 5px 0; /* Spacing between details */
+  color: #555; /* Subtle text color */
+}
+
+/* ================== Modal ================== */
+.event-modal {
+  position: fixed; /* Fixed positioning */
+  top: 0;
+  left: 0;
+  width: 100vw; /* Full viewport width */
+  height: 100vh; /* Full viewport height */
+  background-color: rgba(0, 0, 0, 0.8); /* Dim background */
+  display: flex; /* Flexbox layout */
+  justify-content: center; /* Center content */
+  align-items: center; /* Vertically center content */
+  z-index: 1000; /* Above all other content */
+  opacity: 0; /* Initially hidden */
+  pointer-events: none; /* Disable interaction */
+  transition: opacity 0.3s ease-in-out; /* Fade-in effect */
+}
+
+.event-modal.visible {
+  opacity: 1; /* Show modal */
+  pointer-events: all; /* Enable interaction */
+}
+
+/* Modal Content */
+.event-modal-content {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 90%;
+  max-width: 800px; /* Increase the width for the new layout */
+  max-height: 90vh;
+  display: flex; /* Flex layout for side-by-side content */
+  gap: 20px; /* Space between image and content */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+/* Modal Image Section */
+.image-wrapper {
+  flex: 1; /* Allow image section to take equal space */
+  max-width: 50%; /* Constrain image section width */
+  border-radius: 10px; /* Match modal corners */
+  overflow: hidden;
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0; /* Placeholder background */
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.image-wrapper img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 10px; /* Match the modal corner radius */
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+/* Modal Details Section */
+.modal-details {
+  flex: 2; /* Allow the content to take more space */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px; /* Space between items */
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+.modal-details h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.modal-details p {
+  font-size: 16px;
+  margin: 0;
+}
+
+.modal-details .calendar-button {
+  margin-top: 20px;
+}
+
+
+/* Close Button */
+.modal-close {
+  position: absolute; /* Absolute positioning */
+  top: 10px;
+  right: 10px;
+  background: none; /* Transparent background */
+  border: none; /* Remove default border */
+  font-size: 18px; /* Button font size */
+  font-weight: bold; /* Bold text */
+  cursor: pointer; /* Pointer cursor */
+}
+
+/* ================== Image Wrapper ================== */
+.image-wrapper {
+  position: relative; /* Relative positioning */
+  width: 100%; /* Full modal width */
+  padding-top: 100%; /* Maintain 1:1 aspect ratio */
+  overflow: hidden; /* Clip overflowing content */
+  border-radius: 15px; /* Rounded corners matching card */
+  background-color: #f0f0f0; /* Placeholder background */
+}
+
+.image-wrapper img {
+  position: absolute; /* Absolute positioning within wrapper */
+  top: 0;
+  left: 0;
+  width: 100%; /* Fill wrapper width */
+  height: 100%; /* Fill wrapper height */
+  object-fit: cover; /* Maintain aspect ratio */
+  border-radius: 15px; /* Match wrapper corners */
+}
+
+/* Filter Container */
+.header-row {
+  display: flex;
+  justify-content: center; /* Center the filters */
+  align-items: center; /* Vertically align the filters */
+  gap: 20px; /* Space between filter items */
+  padding: 20px; /* More padding for breathing space */
+  background-color: #f4f4f4; /* Light background for contrast */
+  border-radius: 12px; /* Rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  margin: 20px auto; /* Add space around the filters */
+  max-width: 800px; /* Constrain width */
+}
+
+/* Dropdown Filters */
+#club-filter,
+#food-filter {
+  width: 180px; /* Adjust dropdown width */
+  height: 45px; /* Slightly larger height */
+  font-size: 16px; /* Larger text size for readability */
+  padding: 5px 10px; /* Add inner padding */
+  border: 2px solid #ddd; /* Thicker border for better visibility */
+  border-radius: 8px; /* Rounded corners for modern look */
+  background-color: #fff; /* White background */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+  appearance: none; /* Remove default dropdown arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E"); /* Custom arrow */
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+}
+
+#club-filter:hover,
+#food-filter:hover {
+  border-color: #555; /* Darker border on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+}
+
+/* Filter Labels */
+.filter-label {
+  font-size: 16px; /* Consistent text size */
+  font-weight: bold; /* Bold text for emphasis */
+  color: #304fca; /* Match theme color */
+  margin-right: 10px; /* Space between label and dropdown */
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Responsive Design for Filters */
+@media screen and (max-width: 600px) {
+  .header-row {
+      flex-direction: column; /* Stack filters vertically */
+      gap: 10px; /* Reduce gap between items */
+      padding: 10px; /* Reduce padding */
   }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
+
+  #club-filter,
+  #food-filter {
+      width: 100%; /* Make dropdowns full width */
   }
 }
