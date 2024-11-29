@@ -21,6 +21,20 @@ type MediaResponse struct {
 	} `json:"data"`
 }
 
+type ProcessedResponse struct {
+	Data []struct {
+		ID        string `json:"id"`
+		Caption   string `json:"caption"`
+		MediaURL  string `json:"media_url"`
+		Permalink string `json:"permalink"`
+        Faculty   string `json:"faculty"`
+        Food      string `json:"food"`
+        Date      string `json:"date"`
+        Time      string `json:"time"`
+        Location  string `json:"location"`
+	} `json:"data"`
+}
+
 func main() {
 	var token string
     var frontend string
@@ -79,13 +93,14 @@ func handleRoot (w http.ResponseWriter, r *http.Request) {
     //username := os.Getenv("qUSER") 
 	
 	//get_token()
-    post := retrieve_post_data(token, retrieve_user_id(token))
+    posts := retrieve_post_data(token, retrieve_user_id(token))
+    food_posts := filter_data(posts)
     
-    response := map[string]string{
-        "message": post.Data[0].Caption,
-        "imageUrl": post.Data[0].MediaURL,
+    firstResponse := map[string]string{
+        "message": posts.Data[0].Caption,
+        "imageUrl": posts.Data[0].MediaURL,
     }
-    json.NewEncoder(w).Encode(response)
+    json.NewEncoder(w).Encode(firstResponse)
 }
 
 func handleAuthRedirect(w http.ResponseWriter, r *http.Request) {
