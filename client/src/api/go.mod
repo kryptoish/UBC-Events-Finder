@@ -4,6 +4,7 @@ go 1.23.2
 
 require (
 	github.com/andybalholm/brotli v1.1.1 // indirect
+	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-resty/resty/v2 v2.16.2 // indirect
 	github.com/gofiber/fiber/v2 v2.52.5 // indirect

@@ -3,14 +3,13 @@ package main
 import (
 	"fmt"
 	"strings"
-	"encoding/json"
 	"regexp"
 
 	"github.com/araddon/dateparse"
 )
 
 //Lower case key terms to search for in the post caption
-var KeyTerms []string = {
+var KeyTerms = []string{
 	"pizza",
 	"donuts",
 	"free snacks",
@@ -20,6 +19,16 @@ var KeyTerms []string = {
 	"cookies",
 	"muffins",
 	"snacks",
+}
+
+var FoodTerms = []string{
+	"Pizza",
+	"Donuts",
+	"Cookies",
+	"Muffins",
+	"Snacks",
+	"Red bull",
+	"Candy",
 }
 
 /**
@@ -32,7 +41,7 @@ func filter_data(posts MediaResponse) MediaResponse {
 
 	for _, item := range posts.Data {
 		for _, term := range KeyTerms {
-			if strings.Contains(strings.ToLower(item.Caption), term) {
+			if strings.Contains(strings.ToLower(item.Caption), strings.ToLower(term)) {
 				filteredResponse.Data = append(filteredResponse.Data, item)
 				break;
 			}
@@ -41,35 +50,48 @@ func filter_data(posts MediaResponse) MediaResponse {
 	return filteredResponse
 }
 
-func relavent_info(filteredPosts MediaResponse) ProcessedResponse{
-	//use reg ex to interpret dates
-	/* 
-		\d\d[\/|-]\d\d[\/|-](20)?(21|22|23|24|25)    DD/MM/YYYY | MM/DD/YYYY | ../../YY | ..-..-....
-		[a-z]{3}\s(1st|2nd|3rd|\dth),\s
-
-		\d{1,2}(:\d\d){0,1}([aApP][mM]){0,1} //for times 12:00AM
-
-	*/
+func relavent_info(filteredPosts MediaResponse, username string) ProcessedResponse {
 	var processedData ProcessedResponse
 
-	dateExps := []string {
-		`\b[A-z]{3}\s\d?(1st|2nd|3rd|\d{1,2}th)`,
-		`\b\d\d[\/|-]\d\d[\/|-](20)?(21|22|23|24|25)`,
-	}
+	processedData.Data = make([]struct {
+		ID        string `json:"id"`
+		Caption   string `json:"caption"`
+		MediaURL  string `json:"media_url"`
+		Permalink string `json:"permalink"`
+		Username  string `json:"username"`
+		Food      string `json:"food"`
+		Date      string `json:"date"`
+		Time      string `json:"time"`
+		Location  string `json:"location"`
+	}, len(filteredPosts.Data))
 
-
-	for i, postData : filteredPosts.Data {
+	for i, postData := range filteredPosts.Data {
 		caption := postData.Caption
 		//get time
 		date, time := processDateTime(caption)
 
 		//get location
-
+		location := processLocation(caption)
 
 		//get food
-
-
+		var foods []string
+		for _, food := range FoodTerms {
+			if strings.Contains(strings.ToLower(caption), food) {
+				foods = append(foods, food)
+			}
+		}
+		food := strings.Join(foods, ", ")
+		
+		processedData.Data[i].ID       = postData.ID;
+		processedData.Data[i].Caption  = postData.Caption;
+		processedData.Data[i].MediaURL = postData.MediaURL;
+		processedData.Data[i].Username = username;
+		processedData.Data[i].Food     = food;
+		processedData.Data[i].Date     = date;
+		processedData.Data[i].Time     = time;
+		processedData.Data[i].Location = location;
 	}
+	return processedData
 }
 
 /*
@@ -117,9 +139,19 @@ func processDateTime(caption string) (string, string) {
 }
 
 func processLocation (caption string) string {
-	locationRegex := regexp.MustCompile(`\b((Location|room):\s)([A-Za-z,\s]*[0-9]*)`)
+	locationRegex := regexp.MustCompile(`\b((?i)(location|room):?\s)([A-Za-z, ]*[0-9]*)`)
 
 	locations := locationRegex.FindStringSubmatch(caption)
-	location := locations[2]
+	location := locations[3]
 	return location
+}
+
+func mergedResponses (responses []ProcessedResponse) ProcessedResponse {
+	var merged ProcessedResponse
+
+	for _, response := range responses {
+		merged.Data = append(merged.Data, response.Data...)
+	}
+
+	return merged
 }
