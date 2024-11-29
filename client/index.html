@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FeedUBC - Free Food Events Around Campus</title>
+    <title>feedUBC</title>
     <link rel="stylesheet" href="/src/styles.css">
     <link rel="icon" type="image/x-icon" href="/src/assets/favicon.ico">
 
     <!-- add-to-calandar cdn -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/add-to-calendar-button"></script>
 
-    <script src="/src/main.tsx" type = "module"></script>
+    <script src="/src/script.ts" type = "module"></script>
 </head>
 <body style="background-color: rgb(255, 255, 255);">
     <div style="text-align: center; margin-top: 20px;">
         <img src="/src/assets/feedUBC.png" alt="feedUBC Logo" style="max-width: 400px; height: auto;">
     </div>
     <div class="header-row">
-        <!-- username Filter -->
+        <!-- Username Filter -->
         <div class="filter-dropdown">
-            <label class="filter-label" for="username-filter">Filter by username:</label>
+            <label class="filter-label" for="username-filter">Filter by Username:</label>
             <select id="username-filter" name="username">
                 <option value="all" selected>All</option>
             </select>
@@ -35,13 +35,33 @@
 
     <!-- Container to hold event cards -->
     <div id="events-container"></div>
-    <!-- Modal for Event Details -->
+
+    <!-- Modal -->
     <div id="event-modal" class="event-modal hidden">
         <div class="event-modal-content">
+            <!-- Close Button -->
             <button id="modal-close" class="modal-close">X</button>
-            <div id="modal-details"></div>
+    
+            <!-- Modal Left Section (Image) -->
+            <div class="modal-image">
+                <img id="event-image" src="./src/assets/default.png" alt="Event Image">
+            </div>
+    
+            <!-- Modal Right Section (Details) -->
+            <div class="modal-details" id="modal-details">
+                <h2 id="event-title">Event Title</h2>
+                <p><strong>Date:</strong> <span id="event-date">No date provided</span></p>
+                <p><strong>Time:</strong> <span id="event-time">No time provided</span></p>
+                <p><strong>Location:</strong> <span id="event-location">No location</span></p>
+                <p><strong>Username:</strong> <span id="event-username">N/A</span></p>
+                <p><strong>Food:</strong> <span id="event-food">N/A</span></p>
+                <a id="event-link" href="#" target="_blank" rel="noopener noreferrer">View Original Post</a>
+            </div>
         </div>
     </div>
+    
 
 </body>
 </html>
+
+
