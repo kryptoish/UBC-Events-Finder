@@ -17,34 +17,9 @@ var KeyTerms []string = {
 	"free burgers",
 	"free pizza",
 	"grab some pizza",
-	"will be provided",
-}
-
-var Months []string = {
-	"january",
-	"febuary",
-	"march",
-	"april",
-	"may",
-	"june"
-	"july",
-	"august",
-	"september",
-	"october",
-	"november",
-	"december",
-	"jan",
-	"feb",
-	"mar",
-	"apr",
-	"jun",
-	"jul",
-	"aug",
-	"sep",
-	"sept",
-	"oct",
-	"nov",
-	"dec",
+	"cookies",
+	"muffins",
+	"snacks",
 }
 
 /**
@@ -144,5 +119,7 @@ func processDateTime(caption string) (string, string) {
 func processLocation (caption string) string {
 	locationRegex := regexp.MustCompile(`\b((Location|room):\s)([A-Za-z,\s]*[0-9]*)`)
 
-	locations := 
+	locations := locationRegex.FindStringSubmatch(caption)
+	location := locations[2]
+	return location
 }

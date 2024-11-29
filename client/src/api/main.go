@@ -95,8 +95,9 @@ func handleRoot (w http.ResponseWriter, r *http.Request) {
 	//get_token()
     posts := retrieve_post_data(token, retrieve_user_id(token))
     food_posts := filter_data(posts)
+    relavent_data := relavent_info(food_posts)
     
-    json.NewEncoder(w).Encode(food_posts)
+    json.NewEncoder(w).Encode(relavent_data)
 }
 
 func handleAuthRedirect(w http.ResponseWriter, r *http.Request) {
@@ -111,7 +112,6 @@ func handleAuthRedirect(w http.ResponseWriter, r *http.Request) {
     //untested
     token, err := get_token(code)
     if err != nil {
-        http.Redirect(w, r, "https://google.com", http.StatusOK)
     }
     response := map[string]string{"token": token}
     json.NewEncoder(w).Encode(response)
