@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"strings"
 	"regexp"
+	"time"
 
-	"github.com/araddon/dateparse"
+	//"github.com/araddon/dateparse"
+	"github.com/markusmobius/go-dateparser"
 )
 
 //Lower case key terms to search for in the post caption
@@ -104,6 +106,10 @@ func relavent_info(filteredPosts MediaResponse, username string) ProcessedRespon
 takes the caption and extracts the date and time using regexs
 */
 func processDateTime(caption string) (string, string) {
+	cfg := &dateparser.Configuration{
+		CurrentTime: time.Date(2024, 0, 0, 0, 0, 0, 0, time.UTC),
+	}
+
 	var time string
 	var tempTime string
 	var date string
@@ -112,13 +118,13 @@ func processDateTime(caption string) (string, string) {
 	dateExps := []string {
 		`\b[A-z]{3}\s\d?(1st|2nd|3rd|\d{1,2}th)`,
 		`\d\d[\/|-]\d\d[\/|-](20)?(21|22|23|24|25)`,
-		`((?i)date):?\s+([a-zA-Z0-9,]+ [a-zA-Z0-9]+)`,
+		`((?i)date):?\s+([a-zA-Z0-9,]+ [a-zA-Z0-9]+(,?\s\d\d\d\d)?)`,
 	}
 	postDateRegex := regexp.MustCompile(`(\d\d\d\d)-(\d\d)-(\d\d)`)
 	postTimeRegex := regexp.MustCompile(`(\d\d):(\d\d):(\d\d)`)
 
 	/* If there is no minute info, append blank minute info */
-	timeReg := regexp.MustCompile(`(\d{1,2})(:\d\d)?\s*([aApP][mM])`)
+	timeReg := regexp.MustCompile(`((\d{1,2})(:\d\d)?\s*([aApP][mM])|(\d{1,2})(:\d\d)\s*([aApP][mM])?)`)//-((\d{1,2})(:\d\d)?\s*([aApP][mM])|(\d{1,2})(:\d\d)\s*[aApP][mM])?`)
 	timeString := timeReg.FindStringSubmatch(caption)
 	if timeString == nil {
 		time = ""
@@ -129,24 +135,35 @@ func processDateTime(caption string) (string, string) {
 		tempTime = time
 	}
 
+	//_, dates, _ := dateparser.Search(cfg, caption)
+	//println(dates[1].Date.Period.String())
+
 	for _, pattern := range dateExps{
 		regex := regexp.MustCompile(pattern)
 		if match := regex.FindStringSubmatch(caption); match != nil {
-			println(match[0] + " " + tempTime)
-			dateTime, _ := dateparse.ParseLocal(match[0] + " " + tempTime)
+			yearExp := regexp.MustCompile(`\d\d\d\d`)			
+			if year := yearExp.FindString(match[0]); year == "" {
+				match[0] = match[0] + " 2024"
+				match[2] = match[2] + " 2024"
+				//println(match[0])
+			}
+
+
+			dateTime, _ := dateparser.Parse(cfg, match[0] + " " + tempTime)
 			if strings.Contains(strings.ToLower(match[0]), strings.ToLower("date")) {
-				dateTime, _ = dateparse.ParseLocal(match[2] + " " + tempTime)
+				dateTime, _ = dateparser.Parse(cfg, match[2] + " " + tempTime)
 			}
 				
-			subsections := postDateRegex.FindStringSubmatch(dateTime.String())
-			println(dateTime.String())
-			if subsections[1] == "0000" {
+			subsections := postDateRegex.FindStringSubmatch(dateTime.Time.String())
+			println(dateTime.Time.String())
+			if subsections[1] != "2024" {
 				date = fmt.Sprintf("%s-%s-%s", "2024", subsections[2], subsections[3])
-			} 
+			} else {
+				date = subsections[0]
+			}
 
-			tempTime := postTimeRegex.FindString(dateTime.String())
-			fmt.Printf("date: %s\n", date)
-			fmt.Printf("time: %s\n", tempTime)
+			tempTime := postTimeRegex.FindString(dateTime.Time.String())
+
 			return date, tempTime
 		}
 	}
