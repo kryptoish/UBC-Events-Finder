@@ -194,7 +194,7 @@ body {
 }
 
 /* Dropdown Filters */
-#club-filter,
+#username-filter,
 #food-filter {
   width: 180px; /* Adjust dropdown width */
   height: 45px; /* Slightly larger height */
@@ -212,7 +212,7 @@ body {
   background-size: 12px;
 }
 
-#club-filter:hover,
+#username-filter:hover,
 #food-filter:hover {
   border-color: #555; /* Darker border on hover */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow */
@@ -235,7 +235,7 @@ body {
       padding: 10px; /* Reduce padding */
   }
 
-  #club-filter,
+  #username-filter,
   #food-filter {
       width: 100%; /* Make dropdowns full width */
   }
