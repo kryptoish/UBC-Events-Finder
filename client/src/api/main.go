@@ -6,12 +6,15 @@ import (
     "encoding/json"
     "net/http"
 
-	"github.com/spf13/viper"
-    "github.com/rs/cors"
+	"github.com/spf13/viper" /* for reading local .env file */
+    "github.com/rs/cors" /* for handling re-routing the oauth pipeline */
 )
 
+/* Set 'true' when testing locally, 
+    when true, data is sent to localhost:8080 */
 const local = false;
 
+/* Data recieved from the media call to the instagram graph api */
 type MediaResponse struct {
 	Data []struct {
 		ID        string `json:"id"`
@@ -21,6 +24,7 @@ type MediaResponse struct {
 	} `json:"data"`
 }
 
+/* Data to send to the frontend */
 type ProcessedResponse struct {
 	Data []struct {
 		ID        string `json:"id"`
@@ -37,6 +41,7 @@ type ProcessedResponse struct {
 
 func main() {
     var frontend string
+
 	if (local) {
 		viper.SetConfigFile(".env")
 		viper.ReadInConfig()
@@ -52,28 +57,21 @@ func main() {
 
     mux := http.NewServeMux()
     mux.HandleFunc("/auth/callback", handleAuthRedirect)
-    mux.HandleFunc("/ping", pingHandler)
     mux.HandleFunc("/", handleRoot)
 
     handler := c.Handler(mux)
     address := ":8080"
-    if local {
-        address = "localhost:8080"
-    }
+
     http.ListenAndServe(address, handler)
 }
 
-func pingHandler(w http.ResponseWriter, r *http.Request) {
-    fmt.Print("handle ping\n")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Server is alive"))
-}
 
 func handleRoot (w http.ResponseWriter, r *http.Request) {
-    fmt.Print("handle root\n")
     w.Header().Set("Access-Control-Allow-Origin", "*")
     w.Header().Set("Content-Type", "application/json")
     
+    /* Currently storing each token in env variable 
+        Integrating a database is a future step */
 	var chbe_token string
     var eus_token string
     var ece_token string
@@ -89,28 +87,15 @@ func handleRoot (w http.ResponseWriter, r *http.Request) {
    
     var relavent_data []ProcessedResponse
 
-    chbe_id, _ := retrieve_user_id(chbe_token, w)
-    chbe_posts := retrieve_post_data(chbe_token, chbe_id, w)
-    chbe_food_posts := filter_data(chbe_posts)
-    relavent_data = append(relavent_data, relavent_info(chbe_food_posts, "chbecouncil"))
-    
-    eus_id, _ := retrieve_user_id(eus_token, w)
-    eus_posts := retrieve_post_data(eus_token, eus_id, w)
-    eus_food_posts := filter_data(eus_posts)
-    relavent_data = append(relavent_data, relavent_info(eus_food_posts, "ubcengineers"))
-    
-    ece_id, _ := retrieve_user_id(ece_token, w)
-    ece_posts := retrieve_post_data(ece_token, ece_id, w)
-    ece_food_posts := filter_data(ece_posts)
-    relavent_data = append(relavent_data, relavent_info(ece_food_posts, "eceubc"))
-
+    relavent_data = append(relavent_data, relavent_info(chbe_token, "chbecouncil", w))
+    relavent_data = append(relavent_data, relavent_info(eus_token, "ubcengineers", w))
+    relavent_data = append(relavent_data, relavent_info(ece_token, "eceubc", w))
 
     final_data := mergedResponses(relavent_data)	
     json.NewEncoder(w).Encode(final_data) 
 }
 
 func handleAuthRedirect(w http.ResponseWriter, r *http.Request) {
-    fmt.Printf("handle callback at URL: %s\n", r.URL.String())
     code := r.URL.Query().Get("code")
     if code == "" {
         fmt.Print("no code\n")

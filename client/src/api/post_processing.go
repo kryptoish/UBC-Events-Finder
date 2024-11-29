@@ -5,6 +5,7 @@ import (
 	"strings"
 	"regexp"
 	"time"
+	"net/http"
 
 	//"github.com/araddon/dateparse"
 	"github.com/markusmobius/go-dateparser"
@@ -60,8 +61,12 @@ func filter_data(posts MediaResponse) MediaResponse {
 	return filteredResponse
 }
 
-func relavent_info(filteredPosts MediaResponse, username string) ProcessedResponse {
+func relavent_info(token string, username string, w http.ResponseWriter) ProcessedResponse {
 	var processedData ProcessedResponse
+
+	id, _ := retrieve_user_id(token, w)
+	posts := retrieve_post_data(token, id, w)
+	filteredPosts := filter_data(posts)
 
 	processedData.Data = make([]struct {
 		ID        string `json:"id"`
@@ -156,7 +161,6 @@ func processDateTime(caption string) (string, string) {
 		dateTime, _ := dateparser.Parse(cfg, fmt.Sprintf("%s %s", match[0], postTime))
 
 		if strings.Contains(strings.ToLower(match[0]), strings.ToLower("date")) {
-			fmt.Printf("Regex one pre parse: %s\n",fmt.Sprintf("%s %s", match[2], postTime))
 			dateTime, _ = dateparser.Parse(cfg, fmt.Sprintf("%s %s", match[2], postTime))
 		}
 
@@ -212,14 +216,18 @@ func processDateTime(caption string) (string, string) {
 
 	return date, postTime
 }
-
+/* Takes the caption and returns location data based on common formats.
+	Limited to "location: " tags, or "in BUILDING ###"
+								*/
 func processLocation (caption string) string {
-	locationRegex := regexp.MustCompile(`((?i)(location|room):?\s+)([A-Za-z, ]*[0-9]*)`)
+	locationRegexOne := regexp.MustCompile(`((?i)(location|room):?\s+)([A-Za-z, ]*[0-9]*)`)
+	locationRegexTwo := regexp.MustCompile(`\b((?i)at|in) ([A-Za-z]{3,} [0-9]{3,4})`)
 	var location string
 
-	locations := locationRegex.FindStringSubmatch(caption)
-	if locations != nil {
+	if locations := locationRegexOne.FindStringSubmatch(caption); locations != nil {
 		location = locations[3]
+	} else if locations := locationRegexTwo.FindStringSubmatch(caption); locations != nil {
+		location = locations[2]
 	} else {
 		location = ""
 	}
