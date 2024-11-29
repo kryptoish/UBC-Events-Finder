@@ -10,7 +10,7 @@ import (
     "github.com/rs/cors"
 )
 
-const local = false;
+const local = true;
 
 type MediaResponse struct {
 	Data []struct {
