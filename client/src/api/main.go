@@ -81,7 +81,6 @@ func handleRoot (w http.ResponseWriter, r *http.Request) {
 		chbe_token = os.Getenv("CHBE_KEY")
 	}
    
-    fmt.Printf("CHBE_KEY: %s\n", chbe_token)
     var relavent_data []ProcessedResponse
 
     user_id, username := retrieve_user_id(chbe_token, w)
@@ -93,33 +92,6 @@ func handleRoot (w http.ResponseWriter, r *http.Request) {
     relavent_data = append(relavent_data, relavent_info(food_posts, username))
 
     final_data := mergedResponses(relavent_data)	
-    /*testData := ProcessedResponse{
-		Data: []struct {
-			ID        string `json:"id"`
-			Caption   string `json:"caption"`
-			MediaURL  string `json:"media_url"`
-			Permalink string `json:"permalink"`
-			Username  string `json:"username"`
-			Food      string `json:"food"`
-			Date      string `json:"date"`
-			Time      string `json:"time"`
-			Location  string `json:"location"`
-		}{
-			relavent_data[0].Data[0], // Copy the first element of originalResponse.Data
-		},
-	}
-    if local { 
-        jsonData, _ := json.MarshalIndent(final_data, "", "  ")
-
-        // Print the JSON string
-        fmt.Println(string(jsonData))
-    }*/
-    
-    /*respond := map[string]string {
-        "caption": testData.Data[0].Caption,
-        "media_url": testData.Data[0].MediaURL,
-    }*/
-    //json.NewEncoder(w).Encode(respond)
     json.NewEncoder(w).Encode(final_data) 
 }
 
@@ -139,21 +111,5 @@ func handleAuthRedirect(w http.ResponseWriter, r *http.Request) {
     }
     response := map[string]string{"token": token}
     json.NewEncoder(w).Encode(response)
-    /*
-    userID := retrieve_user_id(token)
-    //err = store_token(userID, token) //something to do with database stuff
-                                    // maybe PostgreSQL on Render
-    if err != nil {
-        http.Error(w, "Failed to store token", http.StatusInternalServerError)
-        return
-    } 
-    */
 
 }
-
-/*
-func printProcessedResponse(info ProcessedResponse) {
-    for _, item := range info.Data {
-        fmt.Printf("")
-    }
-}*/
