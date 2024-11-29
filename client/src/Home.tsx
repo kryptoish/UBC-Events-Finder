@@ -86,13 +86,6 @@ const Home: React.FC = () => {
       return `${formattedTime}:${minute.toString().padStart(2, '0')} ${meridiem}`;
   };
 
-  const calculateEndTime = (startTime: string): string => {
-      if (!startTime) return 'N/A';
-      const [hour, minute] = startTime.split(":").map(Number);
-      const endHour = (hour + 1) % 24;
-      return `${endHour.toString().padStart(2, '0')}:${minute}`;
-  };
-
   return (
       <div className="app">
           <header>
