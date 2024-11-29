@@ -1,116 +1,138 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import './index.css';
+import React, { useEffect, useState } from "react";
+import { Cacheables } from "cacheables";
+import axios from "axios";
+import "./index.css";
 
 interface EventData {
-    id: string;
-    caption: string;
-    media_url: string;
-    permalink: string;
-    username: string;
-    food: string;
-    date: string;
-    time: string;
-    location: string;
+  id: string;
+  caption: string;
+  media_url: string;
+  permalink: string;
+  username: string;
+  food: string;
+  date: string;
+  time: string;
+  location: string;
 }
 
-const api = axios.create({
-    baseURL: 'https://ubc-events-finder.onrender.com/',
+// Cache instance
+const cache = new Cacheables({
+  logTiming: true,
+  log: true,
 });
-
-const CACHE_EXPIRATION_MS = 3600000; // 1 hour
-
-const fetchEvents = async (): Promise<EventData[]> => {
-  const cachedData = localStorage.getItem('eventsCache');
-  const cacheTimestamp = localStorage.getItem('cacheTimestamp');
-
-  if (cachedData && cacheTimestamp && Date.now() - parseInt(cacheTimestamp) < CACHE_EXPIRATION_MS) {
-      return JSON.parse(cachedData);
-  }
-
-  try {
-      const response = await api.get<{ data: EventData[] }>('/');
-      const events = response.data.data;
-      localStorage.setItem('eventsCache', JSON.stringify(events));
-      localStorage.setItem('cacheTimestamp', Date.now().toString());
-      return events;
-  } catch (error) {
-      console.error('Error fetching events:', error);
-      throw new Error('Unable to retrieve events.');
-  }
-};
 
 const Home: React.FC = () => {
   const [events, setEvents] = useState<EventData[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<EventData[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
-  const [filters, setFilters] = useState({ username: 'all', food: 'all' });
+  const [filters, setFilters] = useState({ username: "all", food: "all" });
   const [error, setError] = useState<string | null>(null);
 
+  const apiURL = "https://ubc-events-finder.onrender.com/";
+
   useEffect(() => {
-    const getEvents = async () => {
+    const fetchData = async () => {
       try {
-        const data = await fetchEvents();
-        console.log('Fetched events:', data); // Debug log
-        setEvents(data); // Ensure only valid data is set
+        const response = await cache.cacheable(
+          () => axios.get<{ data: EventData[] }>(apiURL),
+          apiURL,
+          { cachePolicy: "max-age", maxAge: 3600000 } // 1 hour cache
+        );
+
+        const data = response?.data?.data || [];
+        setEvents(data);
+        setFilteredEvents(data);
       } catch (err) {
-        console.error(err);
-        setError('Failed to load events. Please try again later.');
+        console.error("Error fetching events:", err);
+        setError("Failed to load events. Please try again later.");
       }
     };
-  
-    getEvents();
+
+    fetchData();
   }, []);
 
-  const filteredEvents = events
-  ? events.filter((event) => {
-      const usernameMatch = filters.username === 'all' || event.username.toLowerCase() === filters.username;
-      const foodMatch = filters.food === 'all' || event.food.toLowerCase() === filters.food;
-      return usernameMatch && foodMatch;
-    })
-  : [];
+  // Update filtered events whenever filters or events change
+  useEffect(() => {
+    const applyFilters = () => {
+      const { username, food } = filters;
 
+      const filtered = events.filter((event) => {
+        const usernameMatch =
+          username === "all" || event.username.toLowerCase() === username;
+        const foodMatch =
+          food === "all" || event.food.toLowerCase() === food;
+        return usernameMatch && foodMatch;
+      });
+
+      setFilteredEvents(filtered);
+    };
+
+    applyFilters();
+  }, [filters, events]);
+
+  // Utility functions
   const timeFormat = (time: string): string => {
-    if (!time) return 'N/A';
+    if (!time) return "N/A";
+
     const [hour, minute] = time.split(":").map(Number);
-    const meridiem = hour >= 12 ? 'PM' : 'AM';
-    const formattedTime = hour % 12 || 12;
-    return `${formattedTime}:${minute.toString().padStart(2, '0')} ${meridiem}`;
+    if (isNaN(hour) || isNaN(minute)) return "N/A";
+
+    const meridiem = hour >= 12 ? "PM" : "AM";
+    const formattedHour = hour % 12 || 12;
+    return `${formattedHour}:${minute.toString().padStart(2, "0")} ${meridiem}`;
   };
 
-  console.log('Rendering events:', events)
+  const yummyDate = (date: string): string => {
+    if (!date) return "N/A";
+
+    const [year, month, day] = date.split("-").map(Number);
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December",
+    ];
+
+    return `${months[month - 1]} ${day}, ${year}`;
+  };
+
   return (
     <div className="app">
       <header>
         <h1>UBC Events Finder</h1>
       </header>
       {error ? (
-        <div className="error-message">
-          <p>{error}</p>
-        </div>
+        <div className="error-message">{error}</div>
       ) : (
         <>
           <div className="filters">
             <select
-              onChange={(e) => setFilters({ ...filters, username: e.target.value })}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, username: e.target.value }))
+              }
               value={filters.username}
             >
               <option value="all">All Usernames</option>
-              {Array.from(new Set((events || []).map((event) => event.username.toLowerCase()))).map((username) => (
-                <option key={username} value={username}>
-                  {username}
-                </option>
-              ))}
+              {[...new Set(events.map((e) => e.username.toLowerCase()))].map(
+                (username) => (
+                  <option key={username} value={username}>
+                    {username}
+                  </option>
+                )
+              )}
             </select>
             <select
-              onChange={(e) => setFilters({ ...filters, food: e.target.value })}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, food: e.target.value }))
+              }
               value={filters.food}
             >
               <option value="all">All Foods</option>
-              {Array.from(new Set(events.map((event) => event.food.toLowerCase()))).map((food) => (
-                <option key={food} value={food}>
-                  {food || 'No Specific Food'}
-                </option>
-              ))}
+              {[...new Set(events.map((e) => e.food.toLowerCase()))].map(
+                (food) => (
+                  <option key={food} value={food}>
+                    {food}
+                  </option>
+                )
+              )}
             </select>
           </div>
 
@@ -125,14 +147,16 @@ const Home: React.FC = () => {
                   onClick={() => setSelectedEvent(event)}
                 >
                   <img
-                    src={event.media_url || './assets/default.png'}
-                    alt={event.caption || 'N/A'}
-                    onError={(e) => (e.currentTarget.src = './assets/default.png')}
+                    src={event.media_url || "./assets/default.png"}
+                    alt={event.caption}
+                    onError={(e) =>
+                      (e.currentTarget.src = "./assets/default.png")
+                    }
                   />
                   <div className="event-details">
-                    <p><strong>{event.caption || 'N/A'}</strong></p>
+                    <p><strong>{event.caption}</strong></p>
                     <p>
-                      {event.date || 'No Date Provided'} at {timeFormat(event.time || 'N/A')}
+                      {yummyDate(event.date)} at {timeFormat(event.time)}
                     </p>
                   </div>
                 </div>
@@ -143,19 +167,27 @@ const Home: React.FC = () => {
       )}
 
       {selectedEvent && (
-        <div className="modal" onClick={() => setSelectedEvent(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal"
+          onClick={() => setSelectedEvent(null)}
+        >
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <img
-              src={selectedEvent.media_url || './assets/default.png'}
-              alt={selectedEvent.caption || 'N/A'}
-              onError={(e) => (e.currentTarget.src = './assets/default.png')}
+              src={selectedEvent.media_url || "./assets/default.png"}
+              alt={selectedEvent.caption}
+              onError={(e) =>
+                (e.currentTarget.src = "./assets/default.png")
+              }
             />
-            <h2>{selectedEvent.caption || 'N/A'}</h2>
-            <p><strong>Date:</strong> {selectedEvent.date || 'N/A'}</p>
-            <p><strong>Time:</strong> {timeFormat(selectedEvent.time || 'N/A')}</p>
-            <p><strong>Location:</strong> {selectedEvent.location || 'N/A'}</p>
-            <p><strong>Username:</strong> {selectedEvent.username || 'N/A'}</p>
-            <p><strong>Food:</strong> {selectedEvent.food || 'N/A'}</p>
+            <h2>{selectedEvent.caption}</h2>
+            <p><strong>Date:</strong> {yummyDate(selectedEvent.date)}</p>
+            <p><strong>Time:</strong> {timeFormat(selectedEvent.time)}</p>
+            <p><strong>Location:</strong> {selectedEvent.location}</p>
+            <p><strong>Username:</strong> {selectedEvent.username}</p>
+            <p><strong>Food:</strong> {selectedEvent.food}</p>
             <button onClick={() => setSelectedEvent(null)}>Close</button>
           </div>
         </div>
