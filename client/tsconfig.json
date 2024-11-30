@@ -1,7 +1,16 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    "target": "ES2017",                                  /* Use modern JavaScript features like Promises, Set, and String.padStart */
+    "lib": ["ES2017", "DOM"],                            /* Include ES2017 and DOM APIs */
+    "module": "esnext",                                  /* Use ESNext modules for modern imports/exports */
+    "outDir": "./dist",                                  /* Output directory for compiled files */
+    "rootDir": "./",                                     /* Root directory for input files */
+    "moduleResolution": "node",                         /* Resolve modules using Node.js rules */
+    "esModuleInterop": true,                             /* Support CommonJS modules with import/export interop */
+    "forceConsistentCasingInFileNames": true,            /* Enforce case sensitivity in module imports */
+    "strict": true,                                      /* Enable all strict type-checking options */
+    "skipLibCheck": true                                 /* Skip type checking for third-party library files */
+  },
+  "include": ["./src/script.ts"],                        /* Include specific TypeScript file(s) */
+  "exclude": ["./node_modules", "dist", "*.js"]            /* Exclude unnecessary directories and files */
 }

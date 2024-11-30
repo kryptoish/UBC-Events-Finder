@@ -1,0 +1,274 @@
+/* ================== Global Styles ================== */
+body {
+    font-family: 'Noto Sans', sans-serif; /* Global font */
+    font-size: 16px; /* Base font size */
+    line-height: 1.5; /* Better readability */
+    color: #333; /* Default text color */
+    background-color: #f9f9f9; /* Background color */
+}
+
+/* ================== Events Container ================== */
+#events-container {
+    display: flex; /* Flexbox layout */
+    flex-wrap: wrap; /* Allow wrapping to new rows */
+    justify-content: center; /* Center content */
+    align-items: flex-start; /* Align items to the top */
+    padding: 50px; /* Padding around the container */
+    gap: 35px; /* Slightly increased space between items */
+    max-width: 100%; /* Prevent container overflow */
+    box-sizing: border-box; /* Include padding in width */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
+
+/* ================== Event Card ================== */
+.event-card {
+    width: 100%; /* Allow card to expand with the image */
+    max-width: 350px; /* Reduced max width for smaller cards */
+    background-color: #f9f9f9; /* Card background */
+    border-radius: 15px; /* More rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    overflow: hidden; /* Clip overflowing content */
+    margin: 0 auto; /* Center the card within its container */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Hover effect */
+    display: flex; /* Flex layout */
+    flex-direction: column; /* Stack children vertically */
+}
+
+.event-card:hover {
+    transform: scale(1.05); /* Slight zoom effect */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+    cursor: pointer; /* Indicate clickability */
+}
+
+/* Event Image */
+.event-card img {
+    width: 100%; /* Full card width */
+    height: auto; /* Let image height adjust automatically */
+    object-fit: cover; /* Maintain image aspect ratio */
+    border-radius: 15px 15px 0 0; /* Rounded corners matching the card */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+}
+
+/* Event Details Section */
+.event-details {
+    padding: 15px; /* Add padding around details */
+    text-align: center; /* Center-align text */
+    color: #333; /* Text color */
+}
+
+.event-details h2 {
+    font-size: 18px; /* Slightly smaller title size */
+    margin: 10px 0; /* Spacing above and below */
+    font-weight: bold; /* Bold title */
+}
+
+.event-details p {
+    font-size: 14px; /* Smaller paragraph font size */
+    margin: 5px 0; /* Spacing between details */
+    color: #555; /* Subtle text color */
+}
+
+/* Modal Container */
+.event-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8); /* Dim background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.event-modal.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Modal Content */
+.event-modal-content {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 20px;
+    width: 90%;
+    max-width: 900px; /* Constrain modal width */
+    display: flex; /* Flexbox for horizontal alignment */
+    gap: 20px; /* Space between image and details */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    position: relative;
+    max-height: 80vh; /* Prevent overflowing vertically */
+    overflow: hidden; /* Clip any overflowing content */
+}
+
+/* Close Button */
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+}
+
+.modal-close:hover {
+    color: #d00;
+}
+
+/* Modal Left Section (Image) */
+.modal-image {
+    flex: 1; /* Take up 50% of modal */
+    max-width: 50%; /* Constrain width */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-color: #f0f0f0; /* Placeholder background */
+    border-radius: 10px;
+}
+
+.modal-image img {
+    width: 100%; /* Scale to fit width */
+    height: auto; /* Maintain aspect ratio */
+    object-fit: cover; /* Scale without stretching */
+    border-radius: 10px;
+}
+
+/* Modal Right Section (Details) */
+.modal-details {
+    flex: 1; /* Take up 50% of modal */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between details */
+    overflow-y: auto; /* Scroll if content exceeds */
+    max-height: 100%;
+}
+
+.modal-details h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.modal-details p {
+    font-size: 16px;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.modal-details a {
+    color: #304fca;
+    text-decoration: underline;
+}
+
+/* Add-to-Calendar Button */
+.calendar-button {
+    margin-top: 20px;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+    .event-modal-content {
+        flex-direction: column; /* Stack image and details vertically */
+        max-height: 90vh; /* Adjust for smaller screens */
+    }
+
+    .modal-image {
+        max-width: 100%; /* Allow image to take full width */
+        max-height: 200px; /* Adjust height for smaller screens */
+    }
+
+    .modal-details {
+        flex: none;
+    }
+}
+
+
+/* ================== Image Wrapper ================== */
+.image-wrapper {
+    position: relative; /* Relative positioning */
+    width: 100%; /* Full modal width */
+    padding-top: 100%; /* Maintain 1:1 aspect ratio */
+    overflow: hidden; /* Clip overflowing content */
+    border-radius: 15px; /* Rounded corners matching card */
+    background-color: #f0f0f0; /* Placeholder background */
+}
+
+.image-wrapper img {
+    position: absolute; /* Absolute positioning within wrapper */
+    top: 0;
+    left: 0;
+    width: 100%; /* Fill wrapper width */
+    height: 100%; /* Fill wrapper height */
+    object-fit: cover; /* Maintain aspect ratio */
+    border-radius: 15px; /* Match wrapper corners */
+}
+
+/* Filter Container */
+.header-row {
+    display: flex;
+    justify-content: center; /* Center the filters */
+    align-items: center; /* Vertically align the filters */
+    gap: 20px; /* Space between filter items */
+    padding: 20px; /* More padding for breathing space */
+    background-color: #f4f4f4; /* Light background for contrast */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    margin: 20px auto; /* Add space around the filters */
+    max-width: 800px; /* Constrain width */
+}
+
+/* Dropdown Filters */
+#username-filter,
+#food-filter {
+    width: 180px; /* Adjust dropdown width */
+    height: 45px; /* Slightly larger height */
+    font-size: 16px; /* Larger text size for readability */
+    padding: 5px 10px; /* Add inner padding */
+    border: 2px solid #ddd; /* Thicker border for better visibility */
+    border-radius: 8px; /* Rounded corners for modern look */
+    background-color: #fff; /* White background */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+    appearance: none; /* Remove default dropdown arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E"); /* Custom arrow */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+}
+
+#username-filter:hover,
+#food-filter:hover {
+    border-color: #555; /* Darker border on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+}
+
+/* Filter Labels */
+.filter-label {
+    font-size: 16px; /* Consistent text size */
+    font-weight: bold; /* Bold text for emphasis */
+    color: #304fca; /* Match theme color */
+    margin-right: 10px; /* Space between label and dropdown */
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Responsive Design for Filters */
+@media screen and (max-width: 600px) {
+    .header-row {
+        flex-direction: column; /* Stack filters vertically */
+        gap: 10px; /* Reduce gap between items */
+        padding: 10px; /* Reduce padding */
+    }
+
+    #username-filter,
+    #food-filter {
+        width: 100%; /* Make dropdowns full width */
+    }
+}
