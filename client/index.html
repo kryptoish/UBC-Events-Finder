@@ -1,82 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>feedUBC - Free Food Events Around Campus</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>feedUBC - Free Food Events Around Campus</title>
 
-  <!-- Styles and Fonts -->
-  <link rel="stylesheet" href="/src/styles.css" />
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
-  <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@700&display=swap" rel="stylesheet" />
+    <!-- Styles and Fonts -->
+    <link rel="stylesheet" href="/src/styles.css" />
+    <link rel="icon" type="image/x-icon" href="/src/assets/favicon.ico" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dongle:wght@700&display=swap"
+      rel="stylesheet"
+    />
 
-  <!-- Add-to-Calendar CDN -->
-  <script type="module" src="https://cdn.jsdelivr.net/npm/add-to-calendar-button"></script>
+    <!-- Add-to-Calendar CDN -->
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/add-to-calendar-button"
+    ></script>
 
-  <!-- Main Script -->
-  <script src="/src/script.ts" type="module"></script>
-</head>
-<body>
-  <!-- Logo -->
-  <div class="logo">
-    <img src="/src/assets/feedUBC.png" alt="feedUBC Logo" />
-  </div>
-
-  <!-- Gradient Background -->
-  <div class="gradient-background"></div>
-
-  <!-- Main Content -->
-  <div id="main-content">
-    <!-- Loading Spinner -->
-    <div id="loading-spinner" class="loading-spinner hidden">
-      <div class="spinner"></div>
-      <p>Loading events...</p>
+    <!-- Main Script -->
+    <script src="/src/script.ts" type="module"></script>
+  </head>
+  <body>
+    <!-- Logo -->
+    <div class="logo">
+      <img src="/src/assets/feedUBC.png" alt="feedUBC Logo" />
     </div>
 
-    <!-- Filters -->
-    <div class="header-row">
-      <div class="filter-dropdown">
-        <label class="filter-label" for="username-filter">Filter by Username:</label>
-        <select id="username-filter" name="username">
-          <option value="all" selected>All</option>
-        </select>
+    <!-- Gradient Background -->
+    <div class="gradient-background"></div>
+
+    <!-- Main Content -->
+    <div id="main-content">
+      <!-- Loading Spinner -->
+      <div id="loading-spinner" class="loading-spinner hidden">
+        <div class="spinner"></div>
+        <p>Loading events...</p>
       </div>
 
-      <div class="filter-dropdown">
-        <label class="filter-label" for="food-filter">Filter by Food:</label>
-        <select id="food-filter" name="food">
-          <option value="all" selected>All</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Events Container -->
-    <div id="events-container"></div>
-
-    <!-- Modal -->
-    <div id="event-modal" class="event-modal hidden">
-      <div class="event-modal-content">
-        <!-- Close Button -->
-        <button id="modal-close" class="modal-close">❌</button>
-
-        <!-- Modal Image -->
-        <div class="modal-image">
-          <img id="event-image" src="./assets/default.png" alt="Event Image" />
+      <!-- Filters -->
+      <div class="header-row">
+        <!-- Username Filter -->
+        <div class="filter-dropdown">
+          <label class="filter-label" for="username-filter">Filter by Username:</label>
+          <select id="username-filter" name="username">
+            <option value="all" selected>All</option>
+          </select>
         </div>
-
-        <!-- Modal Details -->
-        <div class="modal-details" id="modal-details">
-          <h2 id="event-title">See post for more information.</h2>
-          <p><strong>Date:</strong> <span id="event-date">See post for more information.</span></p>
-          <p><strong>Time:</strong> <span id="event-time">See post for more information.</span></p>
-          <p><strong>Location:</strong> <span id="event-location">See post for more information.</span></p>
-          <p><strong>Username:</strong> <span id="event-username">See post for more information.</span></p>
-          <p><strong>Food:</strong> <span id="event-food">See post for more information.</span></p>
-          <a id="event-link" href="#" target="_blank" rel="noopener noreferrer">View Original Post</a>
-          <div class="calendar-button"></div>
+      
+        <!-- Food Filter -->
+        <div class="filter-dropdown">
+          <label class="filter-label" for="food-filter">Filter by Food:</label>
+          <select id="food-filter" name="food">
+            <option value="all" selected>All</option>
+          </select>
+        </div>
+      
+        <!-- Show Expired Toggle -->
+        <div class="filter-dropdown toggle-container">
+          <label class="filter-label" for="expired-toggle">Show Expired:</label>
+          <input type="checkbox" id="expired-toggle" class="toggle-switch">
         </div>
       </div>
+      
+
+      <!-- Events Container -->
+      <div id="events-container"></div>
+
+      <!-- Modal -->
+      <div id="event-modal" class="event-modal hidden">
+        <div class="event-modal-content">
+          <!-- Close Button -->
+          <button id="modal-close" class="modal-close">❌</button>
+
+          <!-- Modal Image -->
+          <div class="modal-image">
+            <img
+              id="event-image"
+              src="src/assets/default.png"
+              alt="Event Image"
+            />
+          </div>
+
+          <!-- Modal Details -->
+          <div class="modal-details" id="modal-details">
+            <h2 id="event-title">See post for more information.</h2>
+            <p>
+              <strong>Date:</strong>
+              <span id="event-date"></span>
+            </p>
+            <p>
+              <strong>Time:</strong>
+              <span id="event-time"></span>
+            </p>
+            <p>
+              <strong>Location:</strong>
+              <span id="event-location"></span>
+            </p>
+            <p>
+              <strong>Username:</strong>
+              <span id="event-username"></span>
+            </p>
+            <p>
+              <strong>Food:</strong>
+              <span id="event-food"></span>
+            </p>
+            <a
+              id="event-link"
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              >View Original Post</a
+            >
+            <div class="calendar-button"></div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>

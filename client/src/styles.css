@@ -1,80 +1,81 @@
 /* ================== Events Container ================== */
 #events-container {
-    display: flex; /* Flexbox layout */
-    flex-wrap: wrap; /* Allow wrapping to new rows */
-    justify-content: center; /* Center content */
-    align-items: flex-start; /* Align items to the top */
-    padding: 50px; /* Padding around the container */
-    gap: 35px; /* Slightly increased space between items */
-    max-width: 100%; /* Prevent container overflow */
-    box-sizing: border-box; /* Include padding in width */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 50px;
+    gap: 35px;
+    max-width: 100%;
+    box-sizing: border-box;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  /* ================== Event Card ================== */
-  .event-card {
-    width: 100%; /* Allow card to expand with the image */
-    max-width: 350px; /* Reduced max width for smaller cards */
-    background-color: #f9f9f9; /* Card background */
-    border-radius: 15px; /* More rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    overflow: hidden; /* Clip overflowing content */
-    margin: 0 auto; /* Center the card within its container */
-    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Hover effect */
-    display: flex; /* Flex layout */
-    flex-direction: column; /* Stack children vertically */
-  }
-  
-  .event-card:hover {
-    transform: scale(1.05); /* Slight zoom effect */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
-    cursor: pointer; /* Indicate clickability */
-  }
-  
-  /* Event Image */
-  .event-card img {
-    width: 100%; /* Full card width */
-    height: auto; /* Let image height adjust automatically */
-    object-fit: cover; /* Maintain image aspect ratio */
-    border-radius: 15px 15px 0 0; /* Rounded corners matching the card */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
-  }
-  /* Add-to-Calendar Button */
-  .calendar-button {
+}
+
+/* ================== Event Card ================== */
+.event-card {
+    width: 100%;
+    max-width: 350px;
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin: 0 auto;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.event-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+/* Event Image */
+.event-card img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 15px 15px 0 0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Add-to-Calendar Button */
+.calendar-button {
     margin-top: auto;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 10px 0;
-  }
-  
-  /* Event Details Section */
-  .event-details {
-    padding: 15px; /* Add padding around details */
-    text-align: center; /* Center-align text */
-    color: #333; /* Text color */
-  }
-  
-  .event-details h2 {
-    font-size: 20px; /* Slightly smaller title size */
-    margin: 10px 0; /* Spacing above and below */
-    font-weight: bold; /* Bold title */
-  }
-  
-  .event-details p {
-    font-size: 20px; /* Smaller paragraph font size */
-    margin: 0px; /* Spacing between details */
-    color: #555; /* Subtle text color */
-  }
-  
-  /* Modal Container */
-  .event-modal {
+}
+
+/* Event Details Section */
+.event-details {
+    padding: 15px;
+    text-align: center;
+    color: #333;
+}
+
+.event-details h2 {
+    font-size: 28px;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.event-details p {
+    font-size: 24px;
+    margin: 0px;
+    color: #555;
+}
+
+/* Modal Container */
+.event-modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.8); /* Dim background */
+    background-color: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -82,30 +83,30 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease-in-out;
-  }
-  
-  .event-modal.visible {
+}
+
+.event-modal.visible {
     opacity: 1;
     pointer-events: all;
-  }
-  
-  /* Modal Content */
-  .event-modal-content {
+}
+
+/* Modal Content */
+.event-modal-content {
     background-color: #fff;
     border-radius: 15px;
     padding: 20px;
     width: 90%;
-    max-width: 900px; /* Constrain modal width */
-    display: flex; /* Flexbox for horizontal alignment */
-    gap: 20px; /* Space between image and details */
+    max-width: 900px;
+    display: flex;
+    gap: 20px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     position: relative;
-    max-height: 80vh; /* Prevent overflowing vertically */
-    overflow: hidden; /* Clip any overflowing content */
-  }
-  
-  /* Close Button */
-  .modal-close {
+    max-height: 80vh;
+    overflow: hidden;
+}
+
+/* Close Button */
+.modal-close {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -115,164 +116,197 @@
     font-weight: bold;
     cursor: pointer;
     color: #333;
-  }
-  
-  .modal-close:hover {
+}
+
+.modal-close:hover {
     color: #d00;
-  }
-  
-  /* Modal Left Section (Image) */
-  .modal-image {
-    flex: 1; /* Take up 50% of modal */
-    max-width: 50%; /* Constrain width */
+}
+
+/* Modal Left Section (Image) */
+.modal-image {
+    flex: 1;
+    max-width: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    background-color: #f0f0f0; /* Placeholder background */
+    background-color: #f0f0f0;
     border-radius: 10px;
-  }
-  
-  .modal-image img {
-    width: 100%; /* Scale to fit width */
-    height: auto; /* Maintain aspect ratio */
-    object-fit: cover; /* Scale without stretching */
+}
+
+.modal-image img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
     border-radius: 10px;
-  }
-  
-  /* Modal Right Section (Details) */
-  .modal-details {
-    flex: 1; /* Take up 50% of modal */
+}
+
+/* Modal Right Section (Details) */
+.modal-details {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Space between details */
-    overflow-y: auto; /* Scroll if content exceeds */
+    gap: 15px;
+    overflow-y: auto;
     max-height: 100%;
-  }
-  
-  .modal-details h2 {
-    font-size: 24px;
+}
+
+.modal-details h2 {
+    font-size: 20px;
     font-weight: bold;
     margin-bottom: 10px;
-  }
-  
-  .modal-details p {
-    font-size: 16px;
+}
+
+.modal-details p {
+    font-size: 28px;
     margin: 0;
     line-height: 1.6;
-  }
-  
-  .modal-details a {
+}
+
+.modal-details a {
     color: #304fca;
     text-decoration: underline;
-  }
-  
-  /* Add-to-Calendar Button */
-  .calendar-button {
+}
+
+/* Add-to-Calendar Button */
+.calendar-button {
     margin-top: 20px;
-  }
-  
-  /* Responsive Design */
-  @media screen and (max-width: 600px) {
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
     .event-modal-content {
-      flex-direction: column; /* Stack image and details vertically */
-      max-height: 90vh; /* Adjust for smaller screens */
+        flex-direction: column;
+        max-height: 90vh;
     }
-  
+
     .modal-image {
-      max-width: 100%; /* Allow image to take full width */
-      max-height: 200px; /* Adjust height for smaller screens */
+        max-width: 100%;
+        max-height: 200px;
     }
-  
+
     .modal-details {
-      flex: none;
+        flex: none;
     }
-  }
-  
-  /* ================== Image Wrapper ================== */
-  .image-wrapper {
-    position: relative; /* Relative positioning */
-    width: 100%; /* Full modal width */
-    padding-top: 100%; /* Maintain 1:1 aspect ratio */
-    overflow: hidden; /* Clip overflowing content */
-    border-radius: 15px; /* Rounded corners matching card */
-    background-color: #f0f0f0; /* Placeholder background */
-  }
-  
-  .image-wrapper img {
-    position: absolute; /* Absolute positioning within wrapper */
+}
+
+/* ================== Image Wrapper ================== */
+.image-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    overflow: hidden;
+    border-radius: 15px;
+    background-color: #f0f0f0;
+}
+
+.image-wrapper img {
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100%; /* Fill wrapper width */
-    height: 100%; /* Fill wrapper height */
-    object-fit: cover; /* Maintain aspect ratio */
-    border-radius: 15px; /* Match wrapper corners */
-  }
-  
-  /* Filter Container */
-  .header-row {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 15px;
+}
+
+/* Filter Container */
+.header-row {
     display: flex;
-    justify-content: center; /* Center the filters */
-    align-items: center; /* Vertically align the filters */
-    gap: 20px; /* Space between filter items */
-    padding: 20px; /* More padding for breathing space */
-    background-color: #f4f4f4; /* Light background for contrast */
-    border-radius: 12px; /* Rounded corners */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    margin: 20px auto; /* Add space around the filters */
-    max-width: 800px; /* Constrain width */
-  }
-  
-  /* Dropdown Filters */
-  #username-filter,
-  #food-filter {
-    width: 180px; /* Adjust dropdown width */
-    height: 45px; /* Slightly larger height */
-    font-size: 16px; /* Larger text size for readability */
-    padding: 5px 10px; /* Add inner padding */
-    border: 2px solid #ddd; /* Thicker border for better visibility */
-    border-radius: 8px; /* Rounded corners for modern look */
-    background-color: #fff; /* White background */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
-    appearance: none; /* Remove default dropdown arrow */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E"); /* Custom arrow */
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 12px;
-  }
-  
-  #username-filter:hover,
-  #food-filter:hover {
-    border-color: #555; /* Darker border on hover */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow */
-  }
-  
-  /* Filter Labels */
-  .filter-label {
-    font-size: 30px; /* Consistent text size */
-    font-weight: bold; /* Bold text for emphasis */
-    color: #304fca; /* Match theme color */
-    margin-right: 10px; /* Space between label and dropdown */
-    white-space: nowrap; /* Prevent text wrapping */
-  }
-  
-  /* Responsive Design for Filters */
-  @media screen and (max-width: 600px) {
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 800px;
+    font-size: 25px;
+}
+
+/* Dropdown Filters */
+#username-filter,
+#food-filter {
+    width: 180px;
+    height: 45px;
+    font-size: 18px;
+    padding: 5px 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#username-filter:hover,
+#food-filter:hover {
+    border-color: #555;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Toggle Switch Styling */
+.toggle-container {
+    display: flex;
+    align-items: center;
+}
+
+.toggle-label {
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 10px;
+    color: #304fca;
+}
+
+.toggle-switch {
+    width: 50px;
+    height: 25px;
+    appearance: none;
+    background: #ddd;
+    border-radius: 50px;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+    transition: background 0.3s;
+}
+
+.toggle-switch:checked {
+    background: #304fca;
+}
+
+.toggle-switch::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    transition: left 0.3s;
+}
+
+.toggle-switch:checked::before {
+    left: calc(100% - 25px);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
     .header-row {
-      flex-direction: column; /* Stack filters vertically */
-      gap: 10px; /* Reduce gap between items */
-      padding: 10px; /* Reduce padding */
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
     }
-  
+
     #username-filter,
     #food-filter {
-      width: 100%; /* Make dropdowns full width */
+        width: 100%;
     }
-  }
-  
-  /* Loading Spinner */
-  .loading-spinner {
+}
+
+/* Loading Spinner */
+.loading-spinner {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -286,107 +320,147 @@
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .loading-spinner.hidden {
-    display: none; /* Hide spinner by default */
-  }
-  
-  .spinner {
+}
+
+.loading-spinner.hidden {
+    display: none;
+}
+
+.spinner {
     width: 40px;
     height: 40px;
     border: 5px solid #ddd;
-    border-top: 5px solid #304fca; /* Match your theme color */
+    border-top: 5px solid #304fca;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 10px;
-  }
-  
-  @keyframes spin {
+}
+
+@keyframes spin {
     0% {
-      transform: rotate(0deg);
+        transform: rotate(0deg);
     }
     100% {
-      transform: rotate(360deg);
+        transform: rotate(360deg);
     }
-  }
-  
-  .filter-dropdown select:hover {
+}
+
+.filter-dropdown select:hover {
     background-color: #f0f0f0;
     cursor: pointer;
-  }
-  
-  /* Enhanced Gradient Background */
-  .gradient-background {
+}
+
+/* Enhanced Gradient Background */
+.gradient-background {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -1; /* Place it behind all content */
+    z-index: -1;
     background: radial-gradient(
-      circle at 50% 50%,
-      #ff9a9e,
-      #fad0c4,
-      #fbc2eb,
-      #a18cd1,
-      #84fab0,
-      #8fd3f4
+        circle at 50% 50%,
+        #ff9a9e,
+        #fad0c4,
+        #fbc2eb,
+        #a18cd1,
+        #84fab0,
+        #8fd3f4
     );
-    background-size: 300% 300%; /* Larger for smoother transitions */
+    background-size: 300% 300%;
     animation: gradient-animation 15s ease infinite;
-    box-shadow: 0 0 200px 100px rgba(255, 255, 255, 0.3); /* Glow effect */
-    opacity: 0.9; /* Slight transparency */
-    filter: blur(5px); /* Optional dreamy blur */
-    background-attachment: fixed; /* Parallax effect */
-  }
-  
-  /* Keyframes for Animation */
-  @keyframes gradient-animation {
+    box-shadow: 0 0 200px 100px rgba(255, 255, 255, 0.3);
+    opacity: 0.9;
+    filter: blur(5px);
+    background-attachment: fixed;
+}
+
+/* Keyframes for Animation */
+@keyframes gradient-animation {
     0% {
-      background-position: 0% 50%;
+        background-position: 0% 50%;
     }
     25% {
-      background-position: 50% 0%;
+        background-position: 50% 0%;
     }
     50% {
-      background-position: 100% 50%;
+        background-position: 100% 50%;
     }
     75% {
-      background-position: 50% 100%;
+        background-position: 50% 100%;
     }
     100% {
-      background-position: 0% 50%;
+        background-position: 0% 50%;
     }
-  }
-  
-  /* Content Wrapper */
-  #main-content {
-    position: relative; /* Ensure it's above the gradient */
+}
+
+/* Content Wrapper */
+#main-content {
+    position: relative;
     z-index: 1;
     padding: 20px;
-  }
-  
-  html,
-  body {
+}
+
+html,
+body {
     font-family: "Dongle", sans-serif;
     margin: 0;
     padding: 0;
-  }
-  
-  /* Content Wrapper */
-  #main-content {
-    position: relative; /* Ensure it's above the gradient */
-    z-index: 1;
-    padding: 20px;
-  }
-  .logo {
-      text-align: center;
-      margin-top: 20px;
-    }
-    
-    .logo img {
-      max-width: 400px;
-      height: auto;
-    }
-    
+}
+
+.logo {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.logo img {
+    max-width: 400px;
+    height: auto;
+}
+
+/* Expired Overlay */
+.expired-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 2;
+    border-radius: 15px;
+}
+
+.expired-overlay img {
+    width: 50%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Toggle Expired Section */
+.toggle-expired {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle-button {
+    padding: 10px 20px;
+    background-color: #ddd;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-button.active {
+    background-color: #304fca;
+    color: white;
+}
+
+.toggle-button:hover {
+    background-color: #bbb;
+}

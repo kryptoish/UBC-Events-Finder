@@ -1,4 +1,3 @@
-import { Cacheables } from "cacheables";
 
 interface EventData {
     id: string;
@@ -12,14 +11,13 @@ interface EventData {
     location: string;
 }
 
-// Cache instance
-const cache = new Cacheables({
-    logTiming: true,
-    log: true,
-});
 
 document.addEventListener("DOMContentLoaded", () => {
     const jsonURL = "https://ubc-events-finder.onrender.com/";
+    
+    const CACHE_KEY = "cachedEvents";
+    const CACHE_TIMESTAMP_KEY = "cachedTimestamp";
+    const CACHE_EXPIRY_TIME = 3600000; // 1 hour in milliseconds
 
     const loadingSpinner = document.getElementById("loading-spinner")!;
     const errorMessage = "See post for more information.";
@@ -30,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalDetails = document.getElementById("modal-details")!;
     const modalImage = document.getElementById("modal-image");
     const modalCloseButton = document.getElementById("modal-close");
+    const showExpiredToggle = document.getElementById('expired-toggle') as HTMLInputElement;
 
     let fetchedEvents: EventData[] = [];
 
@@ -44,28 +43,36 @@ document.addEventListener("DOMContentLoaded", () => {
         loadingSpinner.classList.remove("hidden");
 
         try {
-            const apiResponse = await cache.cacheable(
-                () => fetch(jsonURL).then((res) => res.json()),
-                jsonURL,
-                {
-                    cachePolicy: "max-age",
-                    maxAge: 3600000, // Cache expires after 1 hour
+            const cachedData = localStorage.getItem(CACHE_KEY);
+            const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+
+            const now = Date.now();
+
+            // Check if cache exists and is not expired
+            if (cachedData && cachedTimestamp && now - parseInt(cachedTimestamp) < CACHE_EXPIRY_TIME) {
+                console.log("Using cached data");
+                fetchedEvents = JSON.parse(cachedData);
+                populateFilters(fetchedEvents);
+                renderEvents(fetchedEvents);
+            } else {
+                console.log("Fetching data from API");
+                const response = await fetch(jsonURL);
+                const apiResponse = await response.json();
+
+                if (!apiResponse || !apiResponse.data || !Array.isArray(apiResponse.data)) {
+                    throw new Error("Invalid API response structure. Expected { data: [...] }");
                 }
-            );
 
-            // Extract the `data` field from the API response
-            if (!apiResponse || !apiResponse.data || !Array.isArray(apiResponse.data)) {
-                throw new Error("Invalid API response structure. Expected { data: [...] }");
-            }
+                fetchedEvents = apiResponse.data;
 
-            const data: EventData[] = apiResponse.data; // Get the array of events
-            console.log("Fetched data:", data); // Debugging log
+                // Save fetched data and timestamp to localStorage
+                localStorage.setItem(CACHE_KEY, JSON.stringify(fetchedEvents));
+                localStorage.setItem(CACHE_TIMESTAMP_KEY, now.toString());
 
-            fetchedEvents = data;
-
-            populateFilters(data); // Pass the array to populateFilters
-            renderEvents(data);    // Pass the array to renderEvents
-        } catch (error) {
+                populateFilters(fetchedEvents);
+                renderEvents(fetchedEvents);
+            }}
+            catch (error) {
             console.error("Error fetching JSON:", error);
             eventsContainer.innerHTML = "Failed to load events. Please try again later.";
         } finally {
@@ -83,7 +90,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        eventsContainer.innerHTML = ""; // Clear previous event cards
+        const showExpired = showExpiredToggle.checked;
+        const currentDateTime = new Date();
+
+        eventsContainer.innerHTML = "";
+
         if (events.length === 0) {
             eventsContainer.innerHTML = "Currently no Free Food Events are available. Check back later!";
             eventsContainer.style.fontSize = "30px";
@@ -91,28 +102,51 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         events.forEach((event) => {
+            const eventDateTime = event.date && event.time ? new Date(`${event.date}T${event.time}`) : null;
+            const isExpired = eventDateTime ? eventDateTime < currentDateTime : false;
+
+            if (isExpired && !showExpired) return;
+
             const eventCard = document.createElement("div");
             eventCard.className = "event-card";
+            eventCard.style.position = "relative";
 
             const img = document.createElement("img");
             img.src = event.media_url;
             img.alt = event.caption;
 
-            // Set default media_url if specified media_url is not found
             img.onerror = () => {
-                img.src = './assets/default.png';
+                img.src = "./assets/default.png";
             };
 
             const details = document.createElement("div");
             details.className = "event-details";
 
-            const formattedTime = timeFormat(event.time);
-            details.innerHTML = `
-                <p><strong>${event.caption}</strong></p>
-                <p>${yummyDate(event.date)} at ${formattedTime}</p>
-            `;
+            const formattedTime = event.time ? timeFormat(event.time) : null;
+            const formattedDate = event.date ? yummyDate(event.date) : null;
 
-            // Add click event to open modal
+            // Update to handle missing date or time
+            if (!formattedDate || !formattedTime) {
+                details.innerHTML = `<p><strong>${event.caption}</strong></p><p>${errorMessage}</p>`;
+            } else {
+                details.innerHTML = `
+                    <p><strong>${event.caption}</strong></p>
+                    <p>${formattedDate} at ${formattedTime}</p>
+                `;
+            }
+
+            if (isExpired) {
+                const expiredOverlay = document.createElement("div");
+                expiredOverlay.className = "expired-overlay";
+
+                const expiredImage = document.createElement("img");
+                expiredImage.src = "src/assets/expired.png";
+                expiredImage.alt = "Expired";
+
+                expiredOverlay.appendChild(expiredImage);
+                eventCard.appendChild(expiredOverlay);
+            }
+
             eventCard.addEventListener("click", () => {
                 openModal(event);
             });
@@ -123,6 +157,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Add event listener for the toggle button
+    showExpiredToggle.addEventListener("change", () => {
+        applyFilters(); // Reapply filters when toggle state changes
+    });
+
+      
+      
     // Open modal and populate it with event details
     function openModal(event: EventData) {
         const modal = document.getElementById("event-modal")!;
@@ -136,17 +177,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const modalLink = document.getElementById("event-link") as HTMLAnchorElement;
 
         // Populate Image Section
-        modalImage.src = event.media_url || "./assets/default.png";
+        modalImage.src = event.media_url || "src/assets/default.png";
         modalImage.alt = event.caption || "Event Image";
 
         // Populate Details Section
-        modalTitle.textContent = event.caption || "Event Title";
-        modalDate.textContent = event.date || "See post for more information.";
-        modalTime.textContent = event.time || "No time provided";
-        modalLocation.textContent = event.location || "No location provided";
-        modalUsername.textContent = event.username || "N/A";
-        modalFood.textContent = event.food || "N/A";
-        modalLink.href = event.permalink || "#";
+        modalTitle.textContent = event.caption || errorMessage;
+        modalDate.textContent = event.date || errorMessage;
+        modalTime.textContent = event.time || errorMessage;
+        modalLocation.textContent = event.location || errorMessage;
+        modalUsername.textContent = event.username || errorMessage;
+        modalFood.textContent = event.food || errorMessage;
+        modalLink.href = event.permalink || errorMessage;
         modalLink.target = "_blank"; // Open in new tab
         modalLink.rel = "noopener noreferrer";
 
@@ -272,7 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // return date in yummy form
     function yummyDate(date: string): string {
-        if (!date) return "No Date Provided"; // Handle missing or empty date
+        if (!date) return errorMessage; // Handle missing or empty date
 
         const [year, month, day] = date.split("-").map(Number);
         if (isNaN(year) || isNaN(month) || isNaN(day)) return errorMessage; // Handle invalid date format
@@ -283,7 +324,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ];
 
         const monthString = months[month - 1];
-        if (!monthString) return "Invalid Date"; // Handle invalid month
+        if (!monthString) return errorMessage; // Handle invalid month
 
         return `${monthString} ${day}, ${year}`;
     }
