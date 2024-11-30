@@ -1,71 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>feedUBC - Free Food Events Around Campus</title>
-    <link rel="stylesheet" href="/src/styles.css">
-    <link rel="icon" type="image/x-icon" href="/src/assets/favicon.ico">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>feedUBC - Free Food Events Around Campus</title>
 
-    <!-- add-to-calandar cdn -->
-    <script type="module" src="https://cdn.jsdelivr.net/npm/add-to-calendar-button"></script>
+  <!-- Styles and Fonts -->
+  <link rel="stylesheet" href="/src/styles.css" />
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@700&display=swap" rel="stylesheet" />
 
-    <script src="/src/script.ts" type = "module"></script>
+  <!-- Add-to-Calendar CDN -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/add-to-calendar-button"></script>
+
+  <!-- Main Script -->
+  <script src="/src/script.ts" type="module"></script>
 </head>
-<body style="background-color: rgb(255, 255, 255);">
-    <div style="text-align: center; margin-top: 20px;">
-        <img src="/src/assets/feedUBC.png" alt="feedUBC Logo" style="max-width: 400px; height: auto;">
-    </div>
-    <div class="header-row">
-        <!-- Username Filter -->
-        <!-- Username Filter -->
-        <div class="filter-dropdown">
-            <label class="filter-label" for="username-filter">Filter by Username:</label>
-            <label class="filter-label" for="username-filter">Filter by Username:</label>
-            <select id="username-filter" name="username">
-                <option value="all" selected>All</option>
-            </select>
-        </div>
-        
-        <div class="filter-dropdown">
-            <label class="filter-label" for="food-filter">Filter by Food:</label>
-            <select id="food-filter" name="food">
-                <option value="all" selected>All</option>
-            </select>
-        </div>
+<body>
+  <!-- Logo -->
+  <div class="logo">
+    <img src="/src/assets/feedUBC.png" alt="feedUBC Logo" />
+  </div>
+
+  <!-- Gradient Background -->
+  <div class="gradient-background"></div>
+
+  <!-- Main Content -->
+  <div id="main-content">
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="loading-spinner hidden">
+      <div class="spinner"></div>
+      <p>Loading events...</p>
     </div>
 
-    <!-- Container to hold event cards -->
+    <!-- Filters -->
+    <div class="header-row">
+      <div class="filter-dropdown">
+        <label class="filter-label" for="username-filter">Filter by Username:</label>
+        <select id="username-filter" name="username">
+          <option value="all" selected>All</option>
+        </select>
+      </div>
+
+      <div class="filter-dropdown">
+        <label class="filter-label" for="food-filter">Filter by Food:</label>
+        <select id="food-filter" name="food">
+          <option value="all" selected>All</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Events Container -->
     <div id="events-container"></div>
 
     <!-- Modal -->
     <div id="event-modal" class="event-modal hidden">
-        <div class="event-modal-content">
-            <!-- Close Button -->
-            <button id="modal-close" class="modal-close">X</button>
-    
-            <!-- Modal Left Section (Image) -->
-            <div class="modal-image">
-                <img id="event-image" src="./src/assets/default.png" alt="Event Image">
-            </div>
-    
-            <!-- Modal Right Section (Details) -->
-            <div class="modal-details" id="modal-details">
-                <h2 id="event-title">Event Title</h2>
-                <p><strong>Date:</strong> <span id="event-date">No date provided</span></p>
-                <p><strong>Time:</strong> <span id="event-time">No time provided</span></p>
-                <p><strong>Location:</strong> <span id="event-location">No location</span></p>
-                <p><strong>Username:</strong> <span id="event-username">N/A</span></p>
-                <p><strong>Food:</strong> <span id="event-food">N/A</span></p>
-                <a id="event-link" href="#" target="_blank" rel="noopener noreferrer">View Original Post</a>
-            </div>
-        </div>
-    </div>
-    
+      <div class="event-modal-content">
+        <!-- Close Button -->
+        <button id="modal-close" class="modal-close">❌</button>
 
+        <!-- Modal Image -->
+        <div class="modal-image">
+          <img id="event-image" src="./assets/default.png" alt="Event Image" />
+        </div>
+
+        <!-- Modal Details -->
+        <div class="modal-details" id="modal-details">
+          <h2 id="event-title">See post for more information.</h2>
+          <p><strong>Date:</strong> <span id="event-date">See post for more information.</span></p>
+          <p><strong>Time:</strong> <span id="event-time">See post for more information.</span></p>
+          <p><strong>Location:</strong> <span id="event-location">See post for more information.</span></p>
+          <p><strong>Username:</strong> <span id="event-username">See post for more information.</span></p>
+          <p><strong>Food:</strong> <span id="event-food">See post for more information.</span></p>
+          <a id="event-link" href="#" target="_blank" rel="noopener noreferrer">View Original Post</a>
+          <div class="calendar-button"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
-
-
-
-

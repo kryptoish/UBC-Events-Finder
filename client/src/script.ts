@@ -21,8 +21,8 @@ const cache = new Cacheables({
 document.addEventListener("DOMContentLoaded", () => {
     const jsonURL = "https://ubc-events-finder.onrender.com/";
 
+    const loadingSpinner = document.getElementById("loading-spinner")!;
     const errorMessage = "See post for more information.";
-
     const eventsContainer = document.getElementById("events-container")!;
     const usernameFilter = document.querySelector('#username-filter') as HTMLSelectElement;
     const foodFilter = document.querySelector('#food-filter') as HTMLSelectElement;
@@ -39,7 +39,10 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Events container element not found.");
             return;
         }
-    
+
+        // Show the loading spinner
+        loadingSpinner.classList.remove("hidden");
+
         try {
             const apiResponse = await cache.cacheable(
                 () => fetch(jsonURL).then((res) => res.json()),
@@ -49,25 +52,29 @@ document.addEventListener("DOMContentLoaded", () => {
                     maxAge: 3600000, // Cache expires after 1 hour
                 }
             );
-    
+
             // Extract the `data` field from the API response
             if (!apiResponse || !apiResponse.data || !Array.isArray(apiResponse.data)) {
                 throw new Error("Invalid API response structure. Expected { data: [...] }");
             }
-    
+
             const data: EventData[] = apiResponse.data; // Get the array of events
             console.log("Fetched data:", data); // Debugging log
-    
+
             fetchedEvents = data;
-    
+
             populateFilters(data); // Pass the array to populateFilters
             renderEvents(data);    // Pass the array to renderEvents
         } catch (error) {
             console.error("Error fetching JSON:", error);
             eventsContainer.innerHTML = "Failed to load events. Please try again later.";
+        } finally {
+            // Hide the loading spinner
+            loadingSpinner.classList.add("hidden");
         }
     }
-    
+
+
 
     // Render events dynamically
     function renderEvents(events: EventData[]) {
@@ -127,11 +134,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const modalUsername = document.getElementById("event-username")!;
         const modalFood = document.getElementById("event-food")!;
         const modalLink = document.getElementById("event-link") as HTMLAnchorElement;
-    
+
         // Populate Image Section
         modalImage.src = event.media_url || "./assets/default.png";
         modalImage.alt = event.caption || "Event Image";
-    
+
         // Populate Details Section
         modalTitle.textContent = event.caption || "Event Title";
         modalDate.textContent = event.date || "See post for more information.";
@@ -140,11 +147,30 @@ document.addEventListener("DOMContentLoaded", () => {
         modalUsername.textContent = event.username || "N/A";
         modalFood.textContent = event.food || "N/A";
         modalLink.href = event.permalink || "#";
-    
+        modalLink.target = "_blank"; // Open in new tab
+        modalLink.rel = "noopener noreferrer";
+
+        // Add-to-Calendar Button
+        const calendarButton = document.createElement("add-to-calendar-button");
+        calendarButton.setAttribute("name", "FREE FOOD brought to you by FeedUBC!");
+        calendarButton.setAttribute("description", event.caption || "Event Description");
+        calendarButton.setAttribute("startDate", event.date || "2024-01-01");
+        calendarButton.setAttribute("startTime", event.time || "12:00 PM");
+        calendarButton.setAttribute("endTime", calculateEndTime(event.time));
+        calendarButton.setAttribute("timeZone", "America/Vancouver");
+        calendarButton.setAttribute("location", event.location || "Event Location");
+        calendarButton.setAttribute("options", "'Google'");
+        calendarButton.setAttribute("inline", "true");
+
+        // Append the calendar button to the modal details section
+        const calendarContainer = document.querySelector(".calendar-button");
+        calendarContainer?.replaceChildren(calendarButton); // Replace existing content with the new button
+
         // Show Modal
         modal.classList.add("visible");
     }
-    
+
+
 
     // Close modal
     function closeModal() {
@@ -162,17 +188,26 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Filter elements not found.");
             return;
         }
+    
+        // Show loading spinner
+        loadingSpinner.classList.remove("hidden");
+    
         const selectedUsername = usernameFilter.value.toLowerCase();
         const selectedFood = foodFilter.value.toLowerCase();
-
+    
         const filteredEvents = fetchedEvents.filter((event) => {
             const usernameMatch = selectedUsername === "all" || event.username.toLowerCase() === selectedUsername;
             const foodMatch = selectedFood === "all" || event.food.toLowerCase() === selectedFood;
             return usernameMatch && foodMatch;
         });
-
+    
+        // Render filtered events
         renderEvents(filteredEvents);
+    
+        // Hide loading spinner
+        setTimeout(() => loadingSpinner.classList.add("hidden"), 300); // Add a small delay for smooth UX
     }
+    
     // Populate filters with unique values
     function populateFilters(data: EventData[]) {
         if (!usernameFilter || !foodFilter) {
@@ -213,20 +248,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return Array.from(new Set(data.map((item) => item[key]?.toLowerCase() || ""))).sort();
     }
-    
+
 
     // Convert 24-hour time to 12-hour format
     function timeFormat(time: string): string {
         if (!time) return errorMessage; // Handle missing or empty time
-    
+
         const [hour, minute] = time.split(":").map(Number);
         if (isNaN(hour) || isNaN(minute)) return errorMessage; // Handle invalid time format
-    
+
         const meridiem = hour >= 12 ? "PM" : "AM";
         const formattedHour = hour % 12 || 12;
         return `${formattedHour}:${minute.toString().padStart(2, "0")} ${meridiem}`;
     }
-    
+
 
     // Calculate end time by adding 1 hour to start time
     function calculateEndTime(startTime: string): string {
@@ -238,21 +273,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // return date in yummy form
     function yummyDate(date: string): string {
         if (!date) return "No Date Provided"; // Handle missing or empty date
-    
+
         const [year, month, day] = date.split("-").map(Number);
         if (isNaN(year) || isNaN(month) || isNaN(day)) return errorMessage; // Handle invalid date format
-    
+
         const months = [
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
         ];
-    
+
         const monthString = months[month - 1];
         if (!monthString) return "Invalid Date"; // Handle invalid month
-    
+
         return `${monthString} ${day}, ${year}`;
     }
-    
+
 
     // Attach event listeners
     usernameFilter.addEventListener("change", applyFilters);
@@ -261,6 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.addEventListener("click", (e) => {
         if (e.target === modal) closeModal();
     });
-
     fetchJSON(); // Fetch and render data on page load
+
+
 });
