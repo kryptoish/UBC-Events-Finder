@@ -206,11 +206,30 @@ func processDateTime(caption string) (string, string) {
 				}
 
 				postTime = postTimeRegex.FindString(dateTime.Time.String())
+				return date, postTime
 			}
 		}
+		/* nothing matched */
+		date     = ""
+		postTime = ""
 	}
-
+	date = checkDateError(date)
+	postTime = checkTimeError(postTime)
 	return date, postTime
+}
+func checkDateError(date string) string {
+	if (strings.Contains(date, "0000") || strings.Contains(date, "0001")) {
+		return ""
+	} else {
+		return date
+	}
+}
+func checkTimeError(postTime string) string {
+	if (strings.Contains(postTime, "00:00:00")) {
+		return ""
+	} else {
+		return postTime 
+	}
 }
 /* Takes the caption and returns location data based on common formats.
 	Limited to "location: " tags, or "in BUILDING ###" */
