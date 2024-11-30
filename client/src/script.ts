@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 expiredOverlay.className = "expired-overlay";
 
                 const expiredImage = document.createElement("img");
-                expiredImage.src = "/assets/expired.png";
+                expiredImage.src = "https://png.pngtree.com/png-clipart/20230804/original/pngtree-vector-red-expired-stamp-expire-round-background-vector-picture-image_9515927.png";
                 expiredImage.alt = "Expired";
 
                 expiredOverlay.appendChild(expiredImage);
