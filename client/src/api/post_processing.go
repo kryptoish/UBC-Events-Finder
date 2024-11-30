@@ -6,12 +6,12 @@ import (
 	"regexp"
 	"time"
 	"net/http"
-
-	//"github.com/araddon/dateparse"
-	"github.com/markusmobius/go-dateparser"
+	
+	/* to reformat dates after processing */
+	"github.com/markusmobius/go-dateparser" 
 )
 
-//Lower case key terms to search for in the post caption
+/* Lower case key terms to search for in the post caption */
 var KeyTerms = []string {
 	"pizza",
 	"donuts",
@@ -27,6 +27,7 @@ var KeyTerms = []string {
 	"burgers",
 }
 
+//Names of foods
 var FoodTerms = []string {
 	"Pizza",
 	"Donuts",
@@ -39,12 +40,9 @@ var FoodTerms = []string {
 	"Burger",
 }
 
-/**
-* 
-* 
-* 
-*/
-func filter_data(posts MediaResponse) MediaResponse {
+/* Filters all instagram posts based on keywords in the caption.
+	In the future integrating a NLP model would be greatly beneficial */
+func filterData(posts MediaResponse) MediaResponse {
 	var filteredResponse MediaResponse
 
 	for _, item := range posts.Data {
@@ -61,12 +59,13 @@ func filter_data(posts MediaResponse) MediaResponse {
 	return filteredResponse
 }
 
-func relavent_info(token string, username string, w http.ResponseWriter) ProcessedResponse {
+/* Returns the relavent info from an account from a token */
+func relaventInfo(token string, username string, w http.ResponseWriter) ProcessedResponse {
 	var processedData ProcessedResponse
 
-	id, _ := retrieve_user_id(token, w)
-	posts := retrieve_post_data(token, id, w)
-	filteredPosts := filter_data(posts)
+	id, _ := retrieveUserId(token, w)
+	posts := retrievePostData(token, id, w)
+	filteredPosts := filterData(posts)
 
 	processedData.Data = make([]struct {
 		ID        string `json:"id"`
@@ -83,7 +82,6 @@ func relavent_info(token string, username string, w http.ResponseWriter) Process
 	for i, postData := range filteredPosts.Data {
 		caption := postData.Caption
 		date, time := processDateTime(caption)
-
 		location := processLocation(caption)
 
 		var foods []string
@@ -107,21 +105,19 @@ func relavent_info(token string, username string, w http.ResponseWriter) Process
 	return processedData
 }
 
-/*
-takes the caption and extracts the date and time using regexs
-*/
+/* takes the caption and extracts the date and time using regexs */
 func processDateTime(caption string) (string, string) {
 	cfg := &dateparser.Configuration {
 		CurrentTime: time.Now(),
 	}
 
+	/* So posts without a date will default to this year */
 	currentYear := fmt.Sprintf("%d", time.Now().Year())
 
 	var postTime string
 	var tempTime string
 	var date string
 
-	/* regexes */
 	dateExps := []string {
 		`((?i)date):?\s+([a-zA-Z0-9,]+ [a-zA-Z0-9]+(,?\s\d\d\d\d)?)`,
 		`[A-z]{3,10}\s\d?(1st|2nd|3rd|\d{1,2}th)`,
@@ -217,8 +213,7 @@ func processDateTime(caption string) (string, string) {
 	return date, postTime
 }
 /* Takes the caption and returns location data based on common formats.
-	Limited to "location: " tags, or "in BUILDING ###"
-								*/
+	Limited to "location: " tags, or "in BUILDING ###" */
 func processLocation (caption string) string {
 	locationRegexOne := regexp.MustCompile(`((?i)(location|room):?\s+)([A-Za-z, ]*[0-9]*)`)
 	locationRegexTwo := regexp.MustCompile(`\b((?i)at|in) ([A-Za-z]{3,} [0-9]{3,4})`)
@@ -234,6 +229,7 @@ func processLocation (caption string) string {
 	return location
 }
 
+/* Merges the data from a slice of ProcessedResponses into one singl */
 func mergedResponses (responses []ProcessedResponse) ProcessedResponse {
 	var merged ProcessedResponse
 

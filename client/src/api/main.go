@@ -1,7 +1,6 @@
 package main
 
 import (
-    "fmt"
     "os"
     "encoding/json"
     "net/http"
@@ -39,6 +38,8 @@ type ProcessedResponse struct {
 	} `json:"data"`
 }
 
+/* Setus up cors mux to allow rerouting, and listens
+    on port 8080*/
 func main() {
     var frontend string
 
@@ -65,48 +66,51 @@ func main() {
     http.ListenAndServe(address, handler)
 }
 
-
+/* Handles getting the post data from instagram api,
+    processing it, then sending back, every time
+    the page is refreshed.                          */
 func handleRoot (w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Access-Control-Allow-Origin", "*")
     w.Header().Set("Content-Type", "application/json")
     
     /* Currently storing each token in env variable 
         Integrating a database is a future step */
-	var chbe_token string
-    var eus_token string
-    var ece_token string
+	var chbeToken string
+    var eusToken string
+    var eceToken string
 	if (local) {
-		chbe_token = viper.Get("CHBE_KEY").(string)
-		eus_token = viper.Get("EUS_KEY").(string)
-		ece_token = viper.Get("ECE_KEY").(string)
+		chbeToken = viper.Get("CHBE_KEY").(string)
+		eusToken = viper.Get("EUS_KEY").(string)
+		eceToken = viper.Get("ECE_KEY").(string)
 	} else {
-		chbe_token = os.Getenv("CHBE_KEY")
-		eus_token = os.Getenv("EUS_KEY")
-		ece_token = os.Getenv("ECE_KEY")
+		chbeToken = os.Getenv("CHBE_KEY")
+		eusToken = os.Getenv("EUS_KEY")
+		eceToken = os.Getenv("ECE_KEY")
 	}
    
-    var relavent_data []ProcessedResponse
+    var relaventData []ProcessedResponse
 
-    relavent_data = append(relavent_data, relavent_info(chbe_token, "chbecouncil", w))
-    relavent_data = append(relavent_data, relavent_info(eus_token, "ubcengineers", w))
-    relavent_data = append(relavent_data, relavent_info(ece_token, "eceubc", w))
+    relaventData = append(relaventData, relaventInfo(chbeToken, "chbecouncil", w))
+    relaventData = append(relaventData, relaventInfo(eusToken, "ubcengineers", w))
+    relaventData = append(relaventData, relaventInfo(eceToken, "eceubc", w))
 
-    final_data := mergedResponses(relavent_data)	
-    json.NewEncoder(w).Encode(final_data) 
+    finalData := mergedResponses(relaventData)	
+    json.NewEncoder(w).Encode(finalData) 
 }
 
+/* Handles the getting a long term access token from the authorization code
+   when a new account gives us permission to use their account             */
 func handleAuthRedirect(w http.ResponseWriter, r *http.Request) {
     code := r.URL.Query().Get("code")
     if code == "" {
-        fmt.Print("no code\n")
         http.Error(w, "Authorization code not found", http.StatusBadRequest)
         return
     }
 
-    //untested
-    token, err := get_token(code)
+    token, err := getToken(code)
     if err != nil {
         http.Error(w, "Authorization code not found", http.StatusBadRequest)
+        return
     }
     response := map[string]string{"token": token}
     json.NewEncoder(w).Encode(response)
