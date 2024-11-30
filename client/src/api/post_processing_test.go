@@ -1,6 +1,11 @@
 package main
+
 import (
 	"testing"
+	"strings"
+	"net/http"
+	"net/http/httptest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFilterData(t *testing.T) {
@@ -29,17 +34,13 @@ func TestFilterData(t *testing.T) {
 			{ID: "3", Caption: "Come grab some free burgers and cookies!", MediaURL: "url3", Permalink: "link3"},
 		},
 	}
+	a := assert.New(t)
 
 	filtered := filterData(posts)
-
-	if len(filtered.Data) != len(expected.Data) {
-		t.Errorf("Expected %d filtered posts, got %d", len(expected.Data), len(filtered.Data))
-	}
+	a.Equal(len(filtered.Data), len(expected.Data))
 
 	for i, post := range filtered.Data {
-		if post.Caption != expected.Data[i].Caption {
-			t.Errorf("Expected Caption: %s, got %s", expected.Data[i].Caption, post.Caption)
-		}
+		a.Equal(post.Caption, expected.Data[i].Caption)
 	}
 }
 
@@ -50,21 +51,22 @@ func TestProcessDateTime(t *testing.T) {
 		wantTime  string
 	}{
 		{"Event on December 1st, 2024 at 5:30PM", "2024-12-01", "17:30:00"},
+		{"Event on December 1st, 2024 at 5PM", "2024-12-01", "17:00:00"},
+		{"Event on December 1st at 5PM", "2024-12-01", "17:00:00"},
 		{"Date: Jan 15, Time: 12:45PM", "2024-01-15", "12:45:00"},
+		{"Big things on January 15, Time: 12:45PM", "2024-01-15", "12:45:00"},
+		{"Big things on January 15, 2026 Time: 12:45PM", "2026-01-15", "12:45:00"},
 		{"The event is on 11/29/2024", "2024-11-29", ""},
 		{"See you at noon", "", ""},
 		{"No date or time provided", "", ""},
+		{"March 12 nothin else", "2024-03-12", ""},
 	}
 
+	a := assert.New(t)
 	for _, test := range tests {
 		gotDate, gotTime := processDateTime(test.caption)
-
-		if gotDate != test.wantDate {
-			t.Errorf("For caption '%s', expected Date: %s, got: %s", test.caption, test.wantDate, gotDate)
-		}
-		if gotTime != test.wantTime {
-			t.Errorf("For caption '%s', expected Time: %s, got: %s", test.caption, test.wantTime, gotTime)
-		}
+		a.Equal(gotDate, test.wantDate)
+		a.Equal(gotTime, test.wantTime)
 	}
 }
 
@@ -79,26 +81,24 @@ func TestProcessLocation(t *testing.T) {
 		{"No location provided", "provided"},
 	}
 
+	a := assert.New(t)
 	for _, test := range tests {
 		gotLocation := processLocation(test.caption)
-
-		if gotLocation != test.wantLocation {
-			t.Errorf("For caption '%s', expected Location: %s, got: %s", test.caption, test.wantLocation, gotLocation)
-		}
+		a.Equal(gotLocation, test.wantLocation)
 	}
 }
 
-/*
+
 func TestRelaventInfo(t *testing.T) {
 	token := "dummy_token"
 	username := "test_user"
 	w := httptest.NewRecorder()
-
+	
 	// Mock retrieveUserId and retrievePostData
-	retrieveUserId = func(token string, w http.ResponseWriter) (string, error) {
-		return "test_id", nil
+	RetrieveUserId = func(token string, w http.ResponseWriter) (string, string) {
+		return "test_id", ""
 	}
-	retrievePostData = func(token, id string, w http.ResponseWriter) MediaResponse {
+	RetrievePostData = func(token, id string, w http.ResponseWriter) MediaResponse {
 		return MediaResponse{
 			Data: []struct {
 				ID        string `json:"id"`
@@ -130,4 +130,172 @@ func TestRelaventInfo(t *testing.T) {
 	if post.Location != "" {
 		t.Errorf("Expected Location: empty, got: %s", post.Location)
 	}
-}*/
+}
+
+func TestMergedResponses(t *testing.T) {
+	// Test cases
+	tests := []struct {
+		name           string
+		inputResponses []ProcessedResponse
+		expected       ProcessedResponse
+	}{
+		{
+			name: "Merge two responses",
+			inputResponses: []ProcessedResponse{
+				{
+					Data: []struct {
+						ID        string `json:"id"`
+						Caption   string `json:"caption"`
+						MediaURL  string `json:"media_url"`
+						Permalink string `json:"permalink"`
+						Username  string `json:"username"`
+						Food      string `json:"food"`
+						Date      string `json:"date"`
+						Time      string `json:"time"`
+						Location  string `json:"location"`
+					}{
+						{
+							ID:        "1",
+							Caption:   "Caption 1",
+							MediaURL:  "https://example.com/media1",
+							Permalink: "https://example.com/post1",
+							Username:  "user1",
+							Food:      "Pizza",
+							Date:      "2024-11-29",
+							Time:      "12:00 PM",
+							Location:  "Location 1",
+						},
+					},
+				},
+				{
+					Data: []struct {
+						ID        string `json:"id"`
+						Caption   string `json:"caption"`
+						MediaURL  string `json:"media_url"`
+						Permalink string `json:"permalink"`
+						Username  string `json:"username"`
+						Food      string `json:"food"`
+						Date      string `json:"date"`
+						Time      string `json:"time"`
+						Location  string `json:"location"`
+					}{
+						{
+							ID:        "2",
+							Caption:   "Caption 2",
+							MediaURL:  "https://example.com/media2",
+							Permalink: "https://example.com/post2",
+							Username:  "user2",
+							Food:      "Burger",
+							Date:      "2024-11-30",
+							Time:      "1:00 PM",
+							Location:  "Location 2",
+						},
+					},
+				},
+			},
+			expected: ProcessedResponse{
+				Data: []struct {
+					ID        string `json:"id"`
+					Caption   string `json:"caption"`
+					MediaURL  string `json:"media_url"`
+					Permalink string `json:"permalink"`
+					Username  string `json:"username"`
+					Food      string `json:"food"`
+					Date      string `json:"date"`
+					Time      string `json:"time"`
+					Location  string `json:"location"`
+				}{
+					{
+						ID:        "1",
+						Caption:   "Caption 1",
+						MediaURL:  "https://example.com/media1",
+						Permalink: "https://example.com/post1",
+						Username:  "user1",
+						Food:      "Pizza",
+						Date:      "2024-11-29",
+						Time:      "12:00 PM",
+						Location:  "Location 1",
+					},
+					{
+						ID:        "2",
+						Caption:   "Caption 2",
+						MediaURL:  "https://example.com/media2",
+						Permalink: "https://example.com/post2",
+						Username:  "user2",
+						Food:      "Burger",
+						Date:      "2024-11-30",
+						Time:      "1:00 PM",
+						Location:  "Location 2",
+					},
+				},
+			},
+		},
+		{
+			name:           "Empty input",
+			inputResponses: []ProcessedResponse{},
+			expected:       ProcessedResponse{Data: nil},
+		},
+		{
+			name: "Single response",
+			inputResponses: []ProcessedResponse{
+				{
+					Data: []struct {
+						ID        string `json:"id"`
+						Caption   string `json:"caption"`
+						MediaURL  string `json:"media_url"`
+						Permalink string `json:"permalink"`
+						Username  string `json:"username"`
+						Food      string `json:"food"`
+						Date      string `json:"date"`
+						Time      string `json:"time"`
+						Location  string `json:"location"`
+					}{
+						{
+							ID:        "3",
+							Caption:   "Caption 3",
+							MediaURL:  "https://example.com/media3",
+							Permalink: "https://example.com/post3",
+							Username:  "user3",
+							Food:      "Sushi",
+							Date:      "2024-11-28",
+							Time:      "6:00 PM",
+							Location:  "Location 3",
+						},
+					},
+				},
+			},
+			expected: ProcessedResponse{
+				Data: []struct {
+					ID        string `json:"id"`
+					Caption   string `json:"caption"`
+					MediaURL  string `json:"media_url"`
+					Permalink string `json:"permalink"`
+					Username  string `json:"username"`
+					Food      string `json:"food"`
+					Date      string `json:"date"`
+					Time      string `json:"time"`
+					Location  string `json:"location"`
+				}{
+					{
+						ID:        "3",
+						Caption:   "Caption 3",
+						MediaURL:  "https://example.com/media3",
+						Permalink: "https://example.com/post3",
+						Username:  "user3",
+						Food:      "Sushi",
+						Date:      "2024-11-28",
+						Time:      "6:00 PM",
+						Location:  "Location 3",
+					},
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := mergedResponses(test.inputResponses)
+			assert.Equal(t, test.expected, result)
+		})
+	}
+}
