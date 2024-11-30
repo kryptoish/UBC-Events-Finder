@@ -1,4 +1,7 @@
-// Interface defining the structure of an event
+
+
+
+
 interface EventData {
     id: string;
     caption: string;
@@ -11,14 +14,14 @@ interface EventData {
     location: string;
 }
 
+
 document.addEventListener("DOMContentLoaded", () => {
-    // Constants for configuration and caching
     const jsonURL = "https://ubc-events-finder.onrender.com/";
+    
     const CACHE_KEY = "cachedEvents";
     const CACHE_TIMESTAMP_KEY = "cachedTimestamp";
     const CACHE_EXPIRY_TIME = 3600000; // 1 hour in milliseconds
 
-    // DOM element references
     const loadingSpinner = document.getElementById("loading-spinner")!;
     const errorMessage = "See post for more information.";
     const eventsContainer = document.getElementById("events-container")!;
@@ -32,9 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let fetchedEvents: EventData[] = [];
 
-    /**
-     * Fetches JSON data from the backend with caching.
-     */
+    // Fetch JSON data from backend with caching
     async function fetchJSON() {
         if (!eventsContainer) {
             console.error("Events container element not found.");
@@ -47,9 +48,10 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const cachedData = localStorage.getItem(CACHE_KEY);
             const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+
             const now = Date.now();
 
-            // Use cached data if it exists and is not expired
+            // Check if cache exists and is not expired
             if (cachedData && cachedTimestamp && now - parseInt(cachedTimestamp) < CACHE_EXPIRY_TIME) {
                 console.log("Using cached data");
                 fetchedEvents = JSON.parse(cachedData);
@@ -72,8 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 populateFilters(fetchedEvents);
                 renderEvents(fetchedEvents);
-            }
-        } catch (error) {
+            }}
+            catch (error) {
             console.error("Error fetching JSON:", error);
             eventsContainer.innerHTML = "Failed to load events. Please try again later.";
         } finally {
@@ -82,9 +84,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    /**
-     * Renders event cards dynamically.
-     */
+
+
+    // Render events dynamically
     function renderEvents(events: EventData[]) {
         if (!eventsContainer) {
             console.error("Events container element not found.");
@@ -94,10 +96,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const showExpired = showExpiredToggle.checked;
         const currentDateTime = new Date();
 
-        // Clear existing events
         eventsContainer.innerHTML = "";
 
-        // Handle no events case
         if (events.length === 0) {
             eventsContainer.innerHTML = "Currently no Free Food Events are available. Check back later!";
             eventsContainer.style.fontSize = "30px";
@@ -108,7 +108,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const eventDateTime = event.date && event.time ? new Date(`${event.date}T${event.time}`) : null;
             const isExpired = eventDateTime ? eventDateTime < currentDateTime : false;
 
-            // Skip expired events if toggle is off
             if (isExpired && !showExpired) return;
 
             const eventCard = document.createElement("div");
@@ -119,7 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
             img.src = event.media_url;
             img.alt = event.caption;
 
-            // Fallback for missing images
             img.onerror = () => {
                 img.src = "/assets/default.png";
             };
@@ -130,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const formattedTime = event.time ? timeFormat(event.time) : null;
             const formattedDate = event.date ? yummyDate(event.date) : null;
 
-            // Show default message if date or time is missing
+            // Update to handle missing date or time
             if (!formattedDate || !formattedTime) {
                 details.innerHTML = `<p><strong>${event.caption}</strong></p><p>${errorMessage}</p>`;
             } else {
@@ -140,20 +138,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
             }
 
-            // Add expired overlay for expired events
             if (isExpired) {
                 const expiredOverlay = document.createElement("div");
                 expiredOverlay.className = "expired-overlay";
 
                 const expiredImage = document.createElement("img");
-                expiredImage.src = "/assets/expired.png";
+                expiredImage.src = "https://png.pngtree.com/png-clipart/20230804/original/pngtree-vector-red-expired-stamp-expire-round-background-vector-picture-image_9515927.png";
                 expiredImage.alt = "Expired";
 
                 expiredOverlay.appendChild(expiredImage);
                 eventCard.appendChild(expiredOverlay);
             }
 
-            // Attach click event to open modal
             eventCard.addEventListener("click", () => {
                 openModal(event);
             });
@@ -164,12 +160,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    /**
-     * Opens a modal to display event details.
-     */
-    function openModal(event: EventData) {
-        if (!modal) return;
+    // Add event listener for the toggle button
+    showExpiredToggle.addEventListener("change", () => {
+        applyFilters(); // Reapply filters when toggle state changes
+    });
 
+      
+      
+    // Open modal and populate it with event details
+    function openModal(event: EventData) {
+        const modal = document.getElementById("event-modal")!;
         const modalImage = document.getElementById("event-image") as HTMLImageElement;
         const modalTitle = document.getElementById("event-title")!;
         const modalDate = document.getElementById("event-date")!;
@@ -179,48 +179,159 @@ document.addEventListener("DOMContentLoaded", () => {
         const modalFood = document.getElementById("event-food")!;
         const modalLink = document.getElementById("event-link") as HTMLAnchorElement;
 
-        modalImage.src = event.media_url || "/assets/default.png";
+        // Populate Image Section
+        modalImage.src = event.media_url || "src/assets/default.png";
         modalImage.alt = event.caption || "Event Image";
 
+        // Populate Details Section
         modalTitle.textContent = event.caption || errorMessage;
         modalDate.textContent = event.date || errorMessage;
         modalTime.textContent = event.time || errorMessage;
         modalLocation.textContent = event.location || errorMessage;
         modalUsername.textContent = event.username || errorMessage;
         modalFood.textContent = event.food || errorMessage;
-        modalLink.href = event.permalink || "#";
-        modalLink.target = "_blank";
+        modalLink.href = event.permalink || errorMessage;
+        modalLink.target = "_blank"; // Open in new tab
         modalLink.rel = "noopener noreferrer";
 
+        // Add-to-Calendar Button
+        const calendarButton = document.createElement("add-to-calendar-button");
+        calendarButton.setAttribute("name", "FREE FOOD brought to you by FeedUBC!");
+        calendarButton.setAttribute("description", event.caption || "Event Description");
+        calendarButton.setAttribute("startDate", event.date || "2024-01-01");
+        calendarButton.setAttribute("startTime", event.time || "12:00 PM");
+        calendarButton.setAttribute("endTime", calculateEndTime(event.time));
+        calendarButton.setAttribute("timeZone", "America/Vancouver");
+        calendarButton.setAttribute("location", event.location || "Event Location");
+        calendarButton.setAttribute("options", "'Google'");
+        calendarButton.setAttribute("inline", "true");
+
+        // Append the calendar button to the modal details section
+        const calendarContainer = document.querySelector(".calendar-button");
+        calendarContainer?.replaceChildren(calendarButton); // Replace existing content with the new button
+
+        // Show Modal
         modal.classList.add("visible");
     }
 
-    /**
-     * Closes the modal.
-     */
+
+
+    // Close modal
     function closeModal() {
-        if (!modal) return;
+        if (!modal) {
+            console.error("Modal element not found.");
+            return;
+        }
+
         modal.classList.remove("visible");
     }
 
-    /**
-     * Converts 24-hour time to 12-hour format.
-     */
+    // Filter events by username and food
+    function applyFilters() {
+        if (!usernameFilter || !foodFilter) {
+            console.error("Filter elements not found.");
+            return;
+        }
+    
+        // Show loading spinner
+        loadingSpinner.classList.remove("hidden");
+    
+        const selectedUsername = usernameFilter.value.toLowerCase();
+        const selectedFood = foodFilter.value.toLowerCase();
+    
+        const filteredEvents = fetchedEvents.filter((event) => {
+            const usernameMatch = selectedUsername === "all" || event.username.toLowerCase() === selectedUsername;
+            const foodMatch = selectedFood === "all" || event.food.toLowerCase() === selectedFood;
+            return usernameMatch && foodMatch;
+        });
+    
+        // Render filtered events
+        renderEvents(filteredEvents);
+    
+        // Hide loading spinner
+        setTimeout(() => loadingSpinner.classList.add("hidden"), 300); // Add a small delay for smooth UX
+    }
+    
+    // Populate filters with unique values
+    function populateFilters(data: EventData[]) {
+        if (!usernameFilter || !foodFilter) {
+            console.error("Filter elements not found.");
+            return;
+        }
+
+        // Get unique usernames and foods while filtering out empty strings
+        const usernames = getUniqueValues(data, "username").filter((username) => username.trim() !== "");
+        const foods = getUniqueValues(data, "food").filter((food) => food.trim() !== "");
+
+        // Set default "All" option
+        usernameFilter.innerHTML = `<option value="all">All</option>`;
+        foodFilter.innerHTML = `<option value="all">All</option>`;
+
+        // Add unique usernames to the username filter
+        usernames.forEach((username) => {
+            const option = document.createElement("option");
+            option.value = username;
+            option.textContent = username;
+            usernameFilter.appendChild(option);
+        });
+
+        // Add unique foods to the food filter
+        foods.forEach((food) => {
+            const option = document.createElement("option");
+            option.value = food;
+            option.textContent = food;
+            foodFilter.appendChild(option);
+        });
+    }
+
+
+    function getUniqueValues(data: EventData[], key: keyof EventData): string[] {
+        if (!Array.isArray(data)) {
+            console.error("Expected an array but received:", data);
+            return [];
+        }
+        return Array.from(new Set(data.map((item) => item[key]?.toLowerCase() || ""))).sort();
+    }
+
+
+    // Convert 24-hour time to 12-hour format
     function timeFormat(time: string): string {
+        if (!time) return errorMessage; // Handle missing or empty time
+
         const [hour, minute] = time.split(":").map(Number);
+        if (isNaN(hour) || isNaN(minute)) return errorMessage; // Handle invalid time format
+
         const meridiem = hour >= 12 ? "PM" : "AM";
         const formattedHour = hour % 12 || 12;
         return `${formattedHour}:${minute.toString().padStart(2, "0")} ${meridiem}`;
     }
 
-    /**
-     * Converts a date string to a more readable format.
-     */
-    function yummyDate(date: string): string {
-        const [year, month, day] = date.split("-").map(Number);
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        return `${months[month - 1]} ${day}, ${year}`;
+
+    // Calculate end time by adding 1 hour to start time
+    function calculateEndTime(startTime: string): string {
+        const [hour, minute] = startTime.split(":").map(Number);
+        const endHour = (hour + 1) % 24;
+        return `${endHour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
     }
+
+    // return date in yummy form
+    function yummyDate(date: string): string {
+        if (!date) return errorMessage; // Handle missing or empty date
+
+        const [year, month, day] = date.split("-").map(Number);
+        if (isNaN(year) || isNaN(month) || isNaN(day)) return errorMessage; // Handle invalid date format
+
+        const months = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        const monthString = months[month - 1];
+        if (!monthString) return errorMessage; // Handle invalid month
+
+        return `${monthString} ${day}, ${year}`;
+    }
+
 
     // Attach event listeners
     usernameFilter.addEventListener("change", applyFilters);
@@ -229,7 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.addEventListener("click", (e) => {
         if (e.target === modal) closeModal();
     });
+    fetchJSON(); // Fetch and render data on page load
 
-    // Fetch data and render events on page load
-    fetchJSON();
+
 });

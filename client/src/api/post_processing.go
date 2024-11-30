@@ -38,33 +38,26 @@ var FoodTerms = []string {
 	"Candy",
 	"Hotdogs",
 	"Burger",
+	"Burgers",
 }
 
-/* Filters all instagram posts based on keywords in the caption.
-	In the future integrating a NLP model would be greatly beneficial */
-func filterData(posts MediaResponse) MediaResponse {
-	var filteredResponse MediaResponse
+/* local alias to allow for mock funcs in testing */
+var RetrieveUserId = func(token string, w http.ResponseWriter) (string, string) {
+	s, u := retrieveUserId(token, w)
+	return s, u
+}
 
-	for _, item := range posts.Data {
-		if strings.Contains(item.Caption, "$") { 
-			continue
-		}
-		for _, term := range KeyTerms {
-			if strings.Contains(strings.ToLower(item.Caption), strings.ToLower(term)) {
-				filteredResponse.Data = append(filteredResponse.Data, item)
-				break
-			}
-		}
-	}
-	return filteredResponse
+/* local alias to allow for mock funcs in testing */
+var RetrievePostData = func(token, id string, w http.ResponseWriter) MediaResponse {
+	return retrievePostData(token, id, w)
 }
 
 /* Returns the relavent info from an account from a token */
 func relaventInfo(token string, username string, w http.ResponseWriter) ProcessedResponse {
 	var processedData ProcessedResponse
 
-	id, _ := retrieveUserId(token, w)
-	posts := retrievePostData(token, id, w)
+	id, _ := RetrieveUserId(token, w)
+	posts := RetrievePostData(token, id, w)
 	filteredPosts := filterData(posts)
 
 	processedData.Data = make([]struct {
@@ -105,6 +98,27 @@ func relaventInfo(token string, username string, w http.ResponseWriter) Processe
 	return processedData
 }
 
+
+/* Filters all instagram posts based on keywords in the caption.
+	In the future integrating a NLP model would be greatly beneficial */
+func filterData(posts MediaResponse) MediaResponse {
+	var filteredResponse MediaResponse
+
+	for _, item := range posts.Data {
+		if strings.Contains(item.Caption, "$") { 
+			continue
+		}
+		for _, term := range KeyTerms {
+			if strings.Contains(strings.ToLower(item.Caption), strings.ToLower(term)) {
+				filteredResponse.Data = append(filteredResponse.Data, item)
+				break
+			}
+		}
+	}
+	return filteredResponse
+}
+
+
 /* takes the caption and extracts the date and time using regexs */
 func processDateTime(caption string) (string, string) {
 	cfg := &dateparser.Configuration {
@@ -121,7 +135,7 @@ func processDateTime(caption string) (string, string) {
 	dateExps := []string {
 		`((?i)date):?\s+([a-zA-Z0-9,]+ [a-zA-Z0-9]+(,?\s\d\d\d\d)?)`,
 		`[A-z]{3,10}\s\d?(1st|2nd|3rd|\d{1,2}th)`,
-		`\d\d[\/|-]\d\d[\/|-](20)?(21|22|23|24|25)`,
+		`\d\d[\/|-]\d\d[\/|-](20)?[12]\d`,
 	}
 	postDateRegex := regexp.MustCompile(`(\d\d\d\d)-(\d\d)-(\d\d)`)
 	postTimeRegex := regexp.MustCompile(`(\d\d):(\d\d):(\d\d)`)
@@ -130,7 +144,6 @@ func processDateTime(caption string) (string, string) {
 	timeReg := regexp.MustCompile(`((\d{1,2})(:\d\d)?\s*([aApP][mM])|(\d{1,2})(:\d\d)\s*([aApP][mM])?)`)
 	timeString := timeReg.FindStringSubmatch(caption)
 	if timeString == nil {
-		postTime = ""
 		tempTime = "00:00"
 	} else if !strings.Contains(timeString[0], ":") {
 		minutes := ":00"
@@ -168,6 +181,7 @@ func processDateTime(caption string) (string, string) {
 		}
 
 		postTime = postTimeRegex.FindString(dateTime.Time.String())
+
 	} else if match := dateExprTwo.FindString(caption); match != "" {
 		match = fmt.Sprintf("%s %s", match, currentYear)
 
@@ -193,7 +207,7 @@ func processDateTime(caption string) (string, string) {
 	} else {
 		for i := 1; i <= 12; i++ {
 			month := time.Month(i).String()
-			monthRegex := regexp.MustCompile(fmt.Sprintf(`(?i)\b%s\b\s(\d{1,2})`, month))
+			monthRegex := regexp.MustCompile(fmt.Sprintf(`(?i)\b%s\b\s(\d{1,2}([,\s]*\d\d\d\d)?)`, month))
 			if match := monthRegex.FindString(caption); match != "" {
 				match = fmt.Sprintf("%s %s", match, postTime)
 
@@ -206,6 +220,8 @@ func processDateTime(caption string) (string, string) {
 				}
 
 				postTime = postTimeRegex.FindString(dateTime.Time.String())
+				date = checkDateError(date)
+				postTime = checkTimeError(postTime)
 				return date, postTime
 			}
 		}
@@ -248,7 +264,8 @@ func processLocation (caption string) string {
 	return location
 }
 
-/* Merges the data from a slice of ProcessedResponses into one singl */
+/* Merges the data from a slice of ProcessedResponses into one data slice
+	in a single ProcessedResponse */
 func mergedResponses (responses []ProcessedResponse) ProcessedResponse {
 	var merged ProcessedResponse
 
