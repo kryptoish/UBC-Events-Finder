@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
             img.alt = event.caption;
 
             img.onerror = () => {
-                img.src = "./assets/default.png";
+                img.src = "/src/assets/default.png";
             };
 
             const details = document.createElement("div");
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 expiredOverlay.className = "expired-overlay";
 
                 const expiredImage = document.createElement("img");
-                expiredImage.src = "src/assets/expired.png";
+                expiredImage.src = "/src/assets/expired.png";
                 expiredImage.alt = "Expired";
 
                 expiredOverlay.appendChild(expiredImage);
