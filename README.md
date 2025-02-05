@@ -1,3 +1,7 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="/client/src/assets/feedUBC.png">
+</picture>
+
 # Team Dior Sausage
 ### Addressing Food Insecurity Among UBC Students
 
@@ -18,3 +22,7 @@ UBC provides a food bank, but its use may feel **intimidating** for some student
 2. Helps **reduce food waste** while supporting students in need?
 
 Creating such a system could enhance students' well-being and alleviate some of the food security challenges on campus.
+
+### Release 1.0 Live NOW!!!
+
+**Link here:** https://github.com/CPEN-221-2024/project-dior-sausage/blob/main/release1.0/RELEASE.md 
