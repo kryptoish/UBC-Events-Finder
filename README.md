@@ -25,4 +25,4 @@ Creating such a system could enhance students' well-being and alleviate some of 
 
 ### Release 1.0 Live NOW!!!
 
-**Link here:** https://github.com/CPEN-221-2024/project-dior-sausage/blob/main/release1.0/RELEASE.md 
+**Link here:** https://github.com/kryptoish/UBC-Events-Finder/blob/main/RELEASE.md
